@@ -1,0 +1,127 @@
+{
+  "title": "Linear Algebra for Deep Learning Quiz",
+  "description": "Test your understanding of vectors, matrices, and operations essential for neural networks",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What is a vector in the context of neural networks?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "A list of numbers representing data or features",
+      "options": [
+        "A list of numbers representing data or features",
+        "A single number",
+        "A 2D table of numbers",
+        "A mathematical function"
+      ],
+      "explanation": "A vector is simply a list of numbers. In neural networks, vectors represent things like pixel values, neuron outputs, or feature values.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "Calculate the dot product of [2, 3, 1] and [4, -1, 2]",
+      "questionType": "multiple_choice",
+      "correctAnswer": "7",
+      "options": ["7", "9", "5", "11"],
+      "explanation": "Dot product = (2×4) + (3×-1) + (1×2) = 8 - 3 + 2 = 7. This is the fundamental operation neurons use to calculate their output.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "What does a matrix represent in a neural network?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The weights connecting one layer to the next",
+      "options": [
+        "The input data",
+        "The weights connecting one layer to the next",
+        "The final output",
+        "The learning rate"
+      ],
+      "explanation": "Matrices store all the weights between neural network layers. Each row represents one neuron's weights, and each column represents connections from one input.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "If you have 5 inputs and 3 neurons in the next layer, what shape should the weight matrix be?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "3×5 (3 rows, 5 columns)",
+      "options": [
+        "5×3 (5 rows, 3 columns)",
+        "3×5 (3 rows, 5 columns)",
+        "5×5 (5 rows, 5 columns)",
+        "3×3 (3 rows, 3 columns)"
+      ],
+      "explanation": "The weight matrix needs 3 rows (one per neuron) and 5 columns (one per input). This gives each of the 3 neurons a weight for each of the 5 inputs.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "What is the main advantage of using matrix operations in neural networks?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "We can calculate all neurons in a layer simultaneously",
+      "options": [
+        "It uses less memory",
+        "We can calculate all neurons in a layer simultaneously",
+        "It's easier to understand",
+        "It prevents errors"
+      ],
+      "explanation": "Matrix operations allow us to process entire layers at once instead of calculating each neuron separately. This makes neural networks thousands of times faster, especially on GPUs.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "Given weights [[0.5, -0.5], [1.0, 0.0]] and input [2, 4], what is the output?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "[-1, 2]",
+      "options": ["[1, 2]", "[-1, 2]", "[3, 4]", "[0, 4]"],
+      "explanation": "First neuron: (0.5×2) + (-0.5×4) = 1 - 2 = -1. Second neuron: (1.0×2) + (0.0×4) = 2 + 0 = 2. Result: [-1, 2]",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "What does the transpose operation do to a matrix?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Swaps rows and columns",
+      "options": [
+        "Multiplies all values by -1",
+        "Swaps rows and columns",
+        "Adds 1 to all values",
+        "Calculates the inverse"
+      ],
+      "explanation": "The transpose operation flips a matrix over its diagonal, turning rows into columns and columns into rows. A 2×3 matrix becomes 3×2 after transposing.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "When processing a batch of 10 images through a layer with 5 inputs and 3 neurons, what is the output shape?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "10×3 (10 samples, 3 neuron outputs each)",
+      "options": [
+        "10×5 (10 samples, 5 features each)",
+        "10×3 (10 samples, 3 neuron outputs each)",
+        "3×10 (3 neurons, 10 outputs each)",
+        "5×3 (5 inputs, 3 neurons)"
+      ],
+      "explanation": "Batch processing maintains the batch dimension. With 10 samples going through a layer that outputs 3 values, you get a 10×3 output matrix.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "Why must matrix dimensions match in neural networks?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The number of outputs from one layer must match the number of inputs to the next",
+      "options": [
+        "To save memory",
+        "To make calculations faster",
+        "The number of outputs from one layer must match the number of inputs to the next",
+        "To prevent overfitting"
+      ],
+      "explanation": "Matrix multiplication requires compatible dimensions. The outputs from one layer become the inputs to the next, so dimensions must align properly for the operations to work.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "In the context of neural networks, what is the dot product primarily used for?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Calculating the weighted sum of inputs for each neuron",
+      "options": [
+        "Measuring the distance between vectors",
+        "Calculating the weighted sum of inputs for each neuron",
+        "Normalizing the data",
+        "Reducing the dimensions"
+      ],
+      "explanation": "The dot product computes the weighted sum of inputs, which is exactly what each neuron needs to do: multiply each input by its weight and sum the results.",
+      "orderIndex": 10
+    }
+  ]
+}

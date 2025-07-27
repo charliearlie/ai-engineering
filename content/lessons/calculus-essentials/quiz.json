@@ -1,0 +1,137 @@
+{
+  "title": "Calculus Essentials for Neural Networks Quiz",
+  "description": "Test your understanding of derivatives, gradients, and how neural networks learn through gradient descent",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What does a derivative measure in the context of neural networks?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "How much the output changes when we adjust a weight",
+      "options": [
+        "The final prediction of the network",
+        "How much the output changes when we adjust a weight",
+        "The size of the neural network",
+        "The accuracy of predictions"
+      ],
+      "explanation": "A derivative measures the rate of change. In neural networks, we use derivatives to understand how adjusting a weight will affect the output or loss.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "In gradient descent, what does the gradient tell us?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Which direction to adjust weights to reduce error",
+      "options": [
+        "The current error value",
+        "Which direction to adjust weights to reduce error",
+        "How many training examples we have",
+        "The size of our dataset"
+      ],
+      "explanation": "The gradient points in the direction of steepest increase. By moving opposite to the gradient (negative gradient), we move toward lower error.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "If the learning rate is too large, what typically happens?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The weights might overshoot and diverge",
+      "options": [
+        "Training becomes faster and more accurate",
+        "The weights might overshoot and diverge",
+        "The model learns nothing",
+        "Training takes the same amount of time"
+      ],
+      "explanation": "A learning rate that's too large causes weights to jump too far, potentially overshooting the minimum and even diverging to infinity.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "What is the chain rule used for in neural networks?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Calculating gradients through multiple layers",
+      "options": [
+        "Connecting neurons together",
+        "Calculating gradients through multiple layers",
+        "Determining the network architecture",
+        "Measuring accuracy"
+      ],
+      "explanation": "The chain rule allows us to calculate how changes in early layers affect the final output by multiplying gradients through the network layers.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "In the gradient descent update rule 'w = w - learning_rate × gradient', why do we subtract?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Because gradient points uphill, we go opposite to move downhill",
+      "options": [
+        "It's just a convention",
+        "Because gradient points uphill, we go opposite to move downhill",
+        "To make the weights smaller",
+        "To increase the learning speed"
+      ],
+      "explanation": "The gradient points in the direction of increasing loss. We want to decrease loss, so we move in the opposite direction by subtracting.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "What happens during the backward pass in backpropagation?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Gradients are calculated for each weight starting from the output",
+      "options": [
+        "Input data flows through the network",
+        "Gradients are calculated for each weight starting from the output",
+        "Weights are randomly initialized",
+        "The network makes predictions"
+      ],
+      "explanation": "During the backward pass, we calculate gradients by propagating the error backward through the network, determining how each weight contributed to the error.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "If a weight has a gradient of -2.0 and learning rate is 0.1, what's the weight update?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Weight increases by 0.2",
+      "options": [
+        "Weight decreases by 0.2",
+        "Weight increases by 0.2",
+        "Weight decreases by 2.0",
+        "Weight stays the same"
+      ],
+      "explanation": "Update = -learning_rate × gradient = -0.1 × (-2.0) = 0.2. The weight increases because the negative gradient means we need to move in the positive direction.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "What is a local minimum in the context of gradient descent?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "A valley that might not be the lowest point overall",
+      "options": [
+        "The global best solution",
+        "A valley that might not be the lowest point overall",
+        "The starting point of training",
+        "The maximum error possible"
+      ],
+      "explanation": "A local minimum is a point where the loss is lower than nearby points, but there might be an even lower point elsewhere. It's like a small valley on a mountain with deeper valleys elsewhere.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "Why do we typically use small learning rates like 0.01 or 0.001?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "To ensure stable convergence without overshooting",
+      "options": [
+        "Because computers can't handle larger numbers",
+        "To ensure stable convergence without overshooting",
+        "To make training take longer",
+        "Because gradients are always very large"
+      ],
+      "explanation": "Small learning rates ensure we take careful steps toward the minimum, avoiding overshooting and instability that can occur with larger steps.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "What role does the loss function play in training?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "It measures how wrong our predictions are",
+      "options": [
+        "It stores the training data",
+        "It measures how wrong our predictions are",
+        "It determines the network architecture",
+        "It controls the learning rate"
+      ],
+      "explanation": "The loss function quantifies the difference between predictions and targets. Gradients of the loss function tell us how to adjust weights to reduce this error.",
+      "orderIndex": 10
+    }
+  ]
+}
