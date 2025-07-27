@@ -1,26 +1,228 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:is(.dark *));
+
+/* Prevent horizontal scrolling on mobile */
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Safe area utilities for mobile devices */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @theme inline {
+  /* This section is primarily for editor autocompletion and can be ignored for styling purposes */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-lora);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary); /* Kept for solid color fallbacks */
+  --color-primary-start: var(--primary-start);
+  --color-primary-end: var(--primary-end);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================
+  Lumina Design System - V1
+  ============================================ */
+
+:root {
+  /* Base Style Values - Lumina V1 */
+  --radius: 0.625rem; /* 10px - Technical precision with modern polish */
+
+  /* Light Mode Palette - Clear, focused, intellectually stimulating */
+  --background: oklch(0.98 0.003 210); /* Soft blue-tinted white */
+  --foreground: oklch(0.22 0.015 260); /* Deep ink blue */
+
+  --card: oklch(1 0 0); /* Pure white for content elevation */
+  --card-foreground: oklch(0.22 0.015 260);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.015 260);
+
+  /* Primary (Teal Gradient) - Lumina V1 */
+  --primary: oklch(0.55 0.12 185); /* Solid primary color, alias for start */
+  --primary-start: oklch(0.55 0.12 185); /* Vibrant teal */
+  --primary-end: oklch(0.58 0.11 190); /* Slightly lighter for gradient */
+  --primary-foreground: oklch(
+    0.98 0.003 210
+  ); /* Light for contrast on primary */
+
+  /* Secondary (Lavender Gray) - Lumina V1 */
+  --secondary: oklch(0.91 0.02 265); /* Soft lavender gray */
+  --secondary-foreground: oklch(0.38 0.08 265); /* Deep purple-gray */
+
+  /* Muted */
+  --muted: oklch(0.94 0.01 220); /* Neutral cool gray */
+  --muted-foreground: oklch(0.48 0.02 220); /* Medium gray */
+
+  /* Accent (Coral) - Lumina V1 */
+  --accent: oklch(0.72 0.15 340); /* Coral pink for highlights */
+  --accent-foreground: oklch(0.98 0.003 210); /* Light for contrast */
+
+  /* Destructive */
+  --destructive: oklch(0.58 0.22 20); /* Clear but not alarming red */
+  --destructive-foreground: oklch(0.98 0.003 210);
+
+  /* UI Elements */
+  --border: oklch(0.92 0.01 220); /* Light gray borders */
+  --input: oklch(0.97 0.005 220); /* Very light gray inputs */
+  --ring: oklch(0.55 0.12 185 / 40%); /* Teal focus ring */
+
+  /* Elevation System - Lumina V1 */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md: 0 3px 6px -1px rgb(0 0 0 / 0.08),
+    0 2px 4px -1px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 8px 16px -2px rgb(0 0 0 / 0.1),
+    0 4px 8px -2px rgb(0 0 0 / 0.08);
+  --shadow-glow: 0 0px 24px 0px oklch(from var(--primary-start) l c h / 25%); /* Teal focus glow */
+}
+
+.dark {
+  /* Dark Mode Palette - Deep, comfortable, focused */
+  --background: oklch(0.15 0.02 245); /* Deep navy */
+  --foreground: oklch(0.92 0.005 220); /* Soft white */
+
+  --card: oklch(0.2 0.02 245); /* Slightly elevated */
+  --card-foreground: oklch(0.92 0.005 220);
+
+  --popover: oklch(0.2 0.02 245);
+  --popover-foreground: oklch(0.92 0.005 220);
+
+  /* Primary (Teal Gradient) - Adjusted for dark mode */
+  --primary: oklch(0.62 0.13 185);
+  --primary-start: oklch(0.62 0.13 185); /* Luminous teal */
+  --primary-end: oklch(0.65 0.12 190); /* Brighter endpoint */
+  --primary-foreground: oklch(0.15 0.02 245); /* Dark for contrast */
+
+  /* Secondary (Lavender Gray) - Adjusted for dark mode */
+  --secondary: oklch(0.25 0.03 265); /* Deep purple-gray */
+  --secondary-foreground: oklch(0.75 0.05 265); /* Light lavender */
+
+  /* Muted */
+  --muted: oklch(0.28 0.02 245); /* Subtle blue-gray */
+  --muted-foreground: oklch(0.68 0.01 220); /* Readable gray */
+
+  /* Accent (Coral) - Maintained vibrancy */
+  --accent: oklch(0.68 0.18 340); /* Vibrant coral */
+  --accent-foreground: oklch(0.15 0.02 245); /* Dark for contrast */
+
+  /* Destructive */
+  --destructive: oklch(0.65 0.2 20); /* Brighter for visibility */
+  --destructive-foreground: oklch(0.92 0.005 220);
+
+  /* UI Elements */
+  --border: oklch(0.3 0.02 245); /* Subtle borders */
+  --input: oklch(0.23 0.02 245); /* Darker than card */
+  --ring: oklch(0.62 0.13 185 / 50%); /* More prominent focus */
+
+  /* Elevation System */
+  --shadow-glow: 0 0px 28px 0px oklch(from var(--primary-start) l c h / 30%); /* Enhanced glow */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background-image: linear-gradient(
+        oklch(from var(--border) l c h / 3%) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to right,
+        oklch(from var(--border) l c h / 3%) 1px,
+        transparent 1px
+      );
+    background-size: 48px 48px;
+    background-attachment: fixed;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Smooth scrolling for anchors */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus visible improvements */
+@layer base {
+  :focus-visible {
+    outline: 2px solid oklch(0.55 0.12 185);
+    outline-offset: 2px;
+  }
+}
+
+/* Custom scrollbar for webkit browsers */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: oklch(from var(--border) l c h / 0.5);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(from var(--border) l c h / 0.8);
+  }
 }

@@ -1,0 +1,112 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+interface ProgressData {
+  lessonId: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+  lastAccessedAt: Date;
+  quizScore?: number;
+  quizPassed?: boolean;
+  quizAttempts?: number;
+}
+
+interface ProgressState {
+  lessonProgress: Map<string, ProgressData>;
+  overallProgress: number;
+  fetchProgress: () => Promise<void>;
+  updateLessonProgress: (lessonId: string, updates: Partial<ProgressData>) => void;
+  markLessonInProgress: (lessonId: string) => void;
+  markLessonCompleted: (lessonId: string) => void;
+  updateQuizScore: (lessonId: string, score: number, passed: boolean) => void;
+  calculateOverallProgress: () => void;
+  resetAllProgress: () => void;
+}
+
+export const useProgressStore = create<ProgressState>()(
+  persist(
+    (set, get) => ({
+      lessonProgress: new Map(),
+      overallProgress: 0,
+
+      fetchProgress: async () => {
+        // In the future, this could fetch from the API
+        // For now, we'll just calculate from local storage
+        get().calculateOverallProgress();
+      },
+
+      updateLessonProgress: (lessonId: string, updates: Partial<ProgressData>) => {
+        set((state) => {
+          const newProgress = new Map(state.lessonProgress);
+          const existing = newProgress.get(lessonId) || {
+            lessonId,
+            status: 'not_started' as const,
+            lastAccessedAt: new Date(),
+          };
+          
+          newProgress.set(lessonId, {
+            ...existing,
+            ...updates,
+            lastAccessedAt: new Date(),
+          });
+
+          return { lessonProgress: newProgress };
+        });
+        get().calculateOverallProgress();
+      },
+
+      markLessonInProgress: (lessonId: string) => {
+        get().updateLessonProgress(lessonId, { status: 'in_progress' });
+      },
+
+      markLessonCompleted: (lessonId: string) => {
+        get().updateLessonProgress(lessonId, { status: 'completed' });
+      },
+
+      updateQuizScore: (lessonId: string, score: number, passed: boolean) => {
+        const existing = get().lessonProgress.get(lessonId);
+        const attempts = (existing?.quizAttempts || 0) + 1;
+        
+        get().updateLessonProgress(lessonId, {
+          quizScore: score,
+          quizPassed: passed,
+          quizAttempts: attempts,
+          status: passed ? 'completed' : 'in_progress',
+        });
+      },
+
+      calculateOverallProgress: () => {
+        const progress = get().lessonProgress;
+        if (progress.size === 0) {
+          set({ overallProgress: 0 });
+          return;
+        }
+
+        const completedLessons = Array.from(progress.values()).filter(
+          (p) => p.status === 'completed'
+        ).length;
+
+        const overallProgress = Math.round((completedLessons / progress.size) * 100);
+        set({ overallProgress });
+      },
+
+      resetAllProgress: () => {
+        set({ lessonProgress: new Map(), overallProgress: 0 });
+      },
+    }),
+    {
+      name: 'ai-engineering-progress',
+      partialize: (state) => ({
+        lessonProgress: Array.from(state.lessonProgress.entries()),
+        overallProgress: state.overallProgress,
+      }),
+      merge: (persistedState: unknown, currentState) => {
+        const state = persistedState as { lessonProgress?: [string, ProgressData][]; overallProgress?: number } | null;
+        return {
+          ...currentState,
+          lessonProgress: new Map(state?.lessonProgress || []),
+          overallProgress: state?.overallProgress || 0,
+        };
+      },
+    }
+  )
+);

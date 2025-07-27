@@ -1,0 +1,122 @@
+{
+  "title": "Introduction to Neural Networks Quiz",
+  "description": "Test your understanding of neural network basics, how they learn, and their core components",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What is the main way that neural networks learn?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "By adjusting weights based on examples",
+      "options": [
+        "By following pre-programmed rules",
+        "By adjusting weights based on examples",
+        "By memorizing all training data",
+        "By random guessing"
+      ],
+      "explanation": "Neural networks learn by adjusting their weights based on examples. They look at the difference between their predictions and correct answers, then update weights to reduce errors.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "In a simple neuron with inputs for temperature (weight=0.5), rain (weight=-2.0), umbrella (weight=1.0), and bias=-10, what would it calculate for a 70°F day with rain and an umbrella?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "26",
+      "options": ["26", "36", "-26", "16"],
+      "explanation": "Calculation: (70 × 0.5) + (1 × -2.0) + (1 × 1.0) + (-10) = 35 - 2 + 1 - 10 = 24. Since this is positive, the neuron would output 'Go outside!'",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "What is the correct order of steps in neural network learning?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Make prediction → Calculate error → Update weights → Repeat",
+      "options": [
+        "Make prediction → Calculate error → Update weights → Repeat",
+        "Calculate error → Make prediction → Update weights → Repeat",
+        "Update weights → Make prediction → Calculate error → Repeat",
+        "Make prediction → Update weights → Calculate error → Repeat"
+      ],
+      "explanation": "The learning process follows this cycle: 1) Make a prediction using current weights, 2) Calculate the error between prediction and correct answer, 3) Update weights to reduce error, 4) Repeat with more examples.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "If you're building a neural network to recognize handwritten digits (0-9), how many neurons would you need in the output layer?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "10",
+      "options": ["1", "9", "10", "100"],
+      "explanation": "You need 10 neurons in the output layer - one for each possible digit (0, 1, 2, 3, 4, 5, 6, 7, 8, 9). Each neuron represents the network's confidence that the input is that particular digit.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "What does a 'weight' represent in a neural network?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "How important or influential an input is",
+      "options": [
+        "How important or influential an input is",
+        "The physical weight of the network",
+        "The number of neurons in a layer",
+        "The final prediction of the network"
+      ],
+      "explanation": "Weights determine how much influence each input has on the neuron's output. Positive weights mean the input encourages activation, while negative weights discourage it.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "In our learning example, if a network learns to multiply by 2 (weight converges to 2.0), what weight would you expect if it learned to multiply by 5?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "5.0",
+      "options": ["2.5", "5.0", "10.0", "0.5"],
+      "explanation": "The weight directly represents the multiplication factor. To multiply inputs by 5, the weight should converge to 5.0 through the learning process.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "Why are neural networks particularly good at tasks like image recognition?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "They can automatically discover complex patterns in data",
+      "options": [
+        "They can automatically discover complex patterns in data",
+        "They memorize every image exactly",
+        "They follow strict programmed rules for images",
+        "They work faster than traditional programs"
+      ],
+      "explanation": "Neural networks excel at pattern recognition because they can automatically learn hierarchical features - from simple edges to complex objects - without being explicitly programmed with rules.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "What happens during the 'forward pass' in a neural network?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Input flows through the network to produce a prediction",
+      "options": [
+        "Weights are updated based on errors",
+        "Input flows through the network to produce a prediction",
+        "The network learns new patterns",
+        "Errors are calculated and sent backwards"
+      ],
+      "explanation": "During the forward pass, input data flows through the network layer by layer, with each layer applying weights and activation functions, until it produces a final prediction at the output.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "If your neural network makes the same prediction for every input, what is the most likely problem?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The weights haven't been properly initialized or trained",
+      "options": [
+        "The network is too smart",
+        "The inputs are all identical",
+        "The weights haven't been properly initialized or trained",
+        "The network has too many neurons"
+      ],
+      "explanation": "If a network always outputs the same prediction, it usually means the weights are stuck (perhaps all zeros or not updating properly during training), preventing the network from learning different patterns.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "What role does the 'bias' play in a neuron?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "It shifts the activation threshold up or down",
+      "options": [
+        "It makes the network biased toward certain answers",
+        "It speeds up computation",
+        "It shifts the activation threshold up or down",
+        "It connects neurons to each other"
+      ],
+      "explanation": "Bias is like a baseline or offset that shifts when a neuron activates. A negative bias means the neuron needs stronger positive inputs to activate, while positive bias makes it easier to activate.",
+      "orderIndex": 10
+    }
+  ]
+}
