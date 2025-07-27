@@ -18,6 +18,8 @@ export async function GET(request: NextRequest): Promise<NextResponse<LessonsApi
     const searchParams = request.nextUrl.searchParams;
     const userIdParam = searchParams.get('userId');
     const difficulty = searchParams.get('difficulty') as 'beginner' | 'intermediate' | 'advanced' | null;
+    const phase = searchParams.get('phase') as 'foundations' | 'modern-architectures' | 'ai-engineering' | null;
+    const orderBy = searchParams.get('orderBy') as 'lessonNumber' | 'difficulty' | 'title' | null;
     
     // Get user ID for progress tracking
     const userId = getApiUserId(userIdParam || undefined);
@@ -33,8 +35,14 @@ export async function GET(request: NextRequest): Promise<NextResponse<LessonsApi
       }, { status: 400 });
     }
 
-    // Fetch lessons with optional difficulty filter
-    const lessons = await getAllLessons(difficulty ? { difficulty } : undefined);
+    // Build filter object
+    const filter: { difficulty?: string; phase?: string; orderBy?: string } = {};
+    if (difficulty) filter.difficulty = difficulty;
+    if (phase) filter.phase = phase;
+    if (orderBy) filter.orderBy = orderBy;
+    
+    // Fetch lessons with filters
+    const lessons = await getAllLessons(Object.keys(filter).length > 0 ? filter : undefined);
     
     // If userId is provided, fetch user progress
     let userProgressData: UserProgress[] = [];

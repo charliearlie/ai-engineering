@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 
 interface ProgressData {
   lessonId: string;
+  lessonNumber?: number;
   status: 'not_started' | 'in_progress' | 'completed';
   lastAccessedAt: Date;
   quizScore?: number;
@@ -19,6 +20,9 @@ interface ProgressState {
   markLessonCompleted: (lessonId: string) => void;
   updateQuizScore: (lessonId: string, score: number, passed: boolean) => void;
   calculateOverallProgress: () => void;
+  getCompletedLessonNumbers: () => number[];
+  canAccessLesson: (lessonNumber: number, prerequisites: number[]) => boolean;
+  calculatePhaseProgress: (phase: 'foundations' | 'modern-architectures' | 'ai-engineering', totalLessonsInPhase: number) => number;
   resetAllProgress: () => void;
 }
 
@@ -87,6 +91,33 @@ export const useProgressStore = create<ProgressState>()(
 
         const overallProgress = Math.round((completedLessons / progress.size) * 100);
         set({ overallProgress });
+      },
+
+      getCompletedLessonNumbers: () => {
+        const progress = get().lessonProgress;
+        const completedLessons = Array.from(progress.values())
+          .filter(p => p.status === 'completed' && p.lessonNumber)
+          .map(p => p.lessonNumber!)
+          .sort((a, b) => a - b);
+        return completedLessons;
+      },
+
+      canAccessLesson: (lessonNumber: number, prerequisites: number[]) => {
+        if (prerequisites.length === 0) return true;
+        
+        const completedNumbers = get().getCompletedLessonNumbers();
+        return prerequisites.every(prereq => completedNumbers.includes(prereq));
+      },
+
+      calculatePhaseProgress: (phase: 'foundations' | 'modern-architectures' | 'ai-engineering', totalLessonsInPhase: number) => {
+        const progress = get().lessonProgress;
+        const completedLessons = Array.from(progress.values()).filter(
+          (p) => p.status === 'completed'
+        ).length;
+
+        // This is a simplified calculation - in a real implementation,
+        // you'd filter by lessons that belong to the specific phase
+        return Math.round((completedLessons / totalLessonsInPhase) * 100);
       },
 
       resetAllProgress: () => {

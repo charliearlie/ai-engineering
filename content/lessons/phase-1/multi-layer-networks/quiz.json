@@ -1,0 +1,127 @@
+{
+  "title": "Multi-layer Networks Quiz",
+  "description": "Test your understanding of deep networks, hidden layers, and the power of depth",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "Why can a multi-layer network solve XOR while a single perceptron cannot?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Hidden layers can create non-linear decision boundaries",
+      "options": [
+        "Multi-layer networks are faster",
+        "Hidden layers can create non-linear decision boundaries",
+        "XOR requires more parameters",
+        "Multi-layer networks use different math"
+      ],
+      "explanation": "Hidden layers transform the input space in non-linear ways, allowing the network to create curved or complex decision boundaries that can separate XOR's classes.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "What happens if you stack multiple linear layers without activation functions?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "They collapse to a single linear transformation",
+      "options": [
+        "The network becomes more powerful",
+        "They collapse to a single linear transformation",
+        "Training becomes faster",
+        "Nothing changes"
+      ],
+      "explanation": "Without activation functions, multiple linear transformations can be combined into one: Linear(Linear(x)) = Linear(x). This is why activation functions are essential for deep learning.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "What does the Universal Approximation Theorem state?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "A network with one hidden layer can approximate any continuous function",
+      "options": [
+        "All neural networks are universal",
+        "A network with one hidden layer can approximate any continuous function",
+        "Deep networks are always better than shallow ones",
+        "Neural networks can solve any problem"
+      ],
+      "explanation": "The theorem proves that a feedforward network with a single hidden layer containing enough neurons can approximate any continuous function to arbitrary accuracy.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "In a network with architecture [784, 128, 64, 10], how many weight matrices are there?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "3",
+      "options": ["4", "3", "2", "5"],
+      "explanation": "There is one weight matrix between each pair of adjacent layers: 784→128, 128→64, and 64→10. That's 3 weight matrices total.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "What typically happens in the first hidden layer of a deep network?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "It learns simple, low-level features",
+      "options": [
+        "It makes the final decision",
+        "It learns simple, low-level features",
+        "It combines all information",
+        "It reduces dimensionality to 1"
+      ],
+      "explanation": "First hidden layers typically learn basic features like edges in images or simple patterns. Deeper layers combine these into increasingly complex representations.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "Why are deep networks often preferred over wide networks?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "They can learn hierarchical features more efficiently",
+      "options": [
+        "They train faster",
+        "They can learn hierarchical features more efficiently",
+        "They use less memory",
+        "They are easier to implement"
+      ],
+      "explanation": "Deep networks can learn hierarchical representations where each layer builds on the previous one. This is more parameter-efficient than having one very wide layer.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "What is the 'vanishing gradient problem' in deep networks?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Gradients become very small as they propagate backward",
+      "options": [
+        "Gradients disappear completely",
+        "Gradients become very small as they propagate backward",
+        "The network forgets how to compute gradients",
+        "Weights become zero"
+      ],
+      "explanation": "In deep networks with certain activation functions (like sigmoid), gradients can become exponentially smaller as they propagate backward through many layers, making learning very slow.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "How does a two-layer network solve XOR?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Hidden layer transforms the problem to be linearly separable",
+      "options": [
+        "By memorizing all four examples",
+        "Hidden layer transforms the problem to be linearly separable",
+        "By using curved activation functions",
+        "By having exactly 4 hidden neurons"
+      ],
+      "explanation": "The hidden layer learns features that transform XOR into a linearly separable problem. For example, it might learn 'AND' and 'OR' features, making the final decision linear.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "What determines the output size of a neural network?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The number of classes or values to predict",
+      "options": [
+        "The input data size",
+        "The number of hidden layers",
+        "The number of classes or values to predict",
+        "The batch size"
+      ],
+      "explanation": "Output size is determined by your task: 1 neuron for binary classification or regression, N neurons for N-class classification, or the dimension of what you're predicting.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "Which activation function helped solve the vanishing gradient problem?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "ReLU",
+      "options": ["Sigmoid", "Tanh", "ReLU", "Softmax"],
+      "explanation": "ReLU (Rectified Linear Unit) has a constant gradient of 1 for positive inputs, avoiding the vanishing gradient problem that sigmoid and tanh suffer from in deep networks.",
+      "orderIndex": 10
+    }
+  ]
+}

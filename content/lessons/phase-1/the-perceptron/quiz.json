@@ -1,0 +1,132 @@
+{
+  "title": "The Perceptron Algorithm Quiz",
+  "description": "Test your understanding of the perceptron, linear separability, and the learning algorithm",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What is the key difference between a perceptron and a modern neuron?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Perceptron uses step activation, modern neurons use smooth functions",
+      "options": [
+        "Perceptrons are faster",
+        "Perceptron uses step activation, modern neurons use smooth functions",
+        "Modern neurons don't have weights",
+        "Perceptrons can solve any problem"
+      ],
+      "explanation": "The perceptron uses a step function (output is 0 or 1), while modern neurons use smooth activation functions like sigmoid or ReLU that allow gradient-based learning.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "When does the perceptron update its weights?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Only when it makes a wrong prediction",
+      "options": [
+        "After every example",
+        "Only when it makes a wrong prediction",
+        "Only when it makes a correct prediction",
+        "At the end of each epoch"
+      ],
+      "explanation": "The perceptron follows a simple rule: if the prediction is correct, do nothing. If wrong, update weights toward the correct answer. This is different from gradient descent which updates on every example.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "What does 'linearly separable' mean?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "A straight line can separate the two classes",
+      "options": [
+        "The data is arranged in a line",
+        "A straight line can separate the two classes",
+        "The classes have the same number of points",
+        "The data has linear relationships"
+      ],
+      "explanation": "Data is linearly separable if you can draw a straight line (or hyperplane in higher dimensions) that perfectly separates the two classes with no misclassifications.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "Why can't a single perceptron solve the XOR problem?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "XOR is not linearly separable",
+      "options": [
+        "The perceptron is too simple",
+        "XOR is not linearly separable",
+        "The learning rate is wrong",
+        "It needs more training time"
+      ],
+      "explanation": "XOR outputs 1 when inputs differ and 0 when they're the same. No single straight line can separate these two groups, making it impossible for a single perceptron to solve.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "If a perceptron predicts 0 but the correct answer is 1, how are the weights updated?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "weights = weights + learning_rate × input",
+      "options": [
+        "weights = weights - learning_rate × input",
+        "weights = weights + learning_rate × input",
+        "weights = weights × learning_rate",
+        "weights remain unchanged"
+      ],
+      "explanation": "When the perceptron predicts 0 but should predict 1, it adds the input vector to the weights (scaled by learning rate). This moves the decision boundary toward the misclassified point.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "What does the Perceptron Convergence Theorem guarantee?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "If data is linearly separable, the perceptron will find a solution",
+      "options": [
+        "The perceptron will always find the best solution",
+        "If data is linearly separable, the perceptron will find a solution",
+        "The perceptron will converge in exactly 100 iterations",
+        "The perceptron can solve any classification problem"
+      ],
+      "explanation": "The theorem proves that if a linear separator exists, the perceptron algorithm will find it in a finite number of steps. However, it doesn't guarantee finding the best separator or working on non-linearly separable data.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "How does a multi-class perceptron typically work?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "One perceptron per class using one-vs-all strategy",
+      "options": [
+        "A single perceptron with multiple outputs",
+        "One perceptron per class using one-vs-all strategy",
+        "Random selection between classes",
+        "It cannot handle multiple classes"
+      ],
+      "explanation": "Multi-class perceptrons typically use one-vs-all strategy: train one perceptron per class to distinguish that class from all others, then predict the class whose perceptron has the highest activation.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "What is the typical learning rate for the original perceptron algorithm?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "1.0",
+      "options": ["0.01", "0.1", "1.0", "10.0"],
+      "explanation": "The original perceptron algorithm uses a learning rate of 1.0, meaning it fully adds or subtracts the input vector when updating. Modern variants often use smaller rates for stability.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "Which logic gate patterns CAN a single perceptron learn?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "AND, OR, NAND, NOR",
+      "options": [
+        "Only AND",
+        "AND, OR, NAND, NOR",
+        "All logic gates including XOR",
+        "No logic gates"
+      ],
+      "explanation": "A perceptron can learn any linearly separable logic gate. AND, OR, NAND, and NOR are all linearly separable. XOR and XNOR are not linearly separable and require multiple layers.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "What advantage does the Averaged Perceptron have over the standard version?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Better generalization on unseen data",
+      "options": [
+        "Faster training time",
+        "Better generalization on unseen data",
+        "Can solve XOR",
+        "Uses less memory"
+      ],
+      "explanation": "The Averaged Perceptron maintains a running average of all weight vectors seen during training. This averaging often leads to better performance on test data by reducing overfitting to training examples.",
+      "orderIndex": 10
+    }
+  ]
+}

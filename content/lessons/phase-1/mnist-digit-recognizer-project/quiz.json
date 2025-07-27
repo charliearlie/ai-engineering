@@ -1,0 +1,132 @@
+{
+  "title": "MNIST Digit Recognizer Project Quiz",
+  "description": "Test your understanding of building a complete neural network for digit recognition",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "Why do we normalize MNIST pixel values from [0, 255] to [0, 1]?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "To prevent saturation of activation functions and improve gradient flow",
+      "options": [
+        "To reduce memory usage",
+        "To prevent saturation of activation functions and improve gradient flow",
+        "Because neural networks only accept values between 0 and 1",
+        "To make the images easier to visualize"
+      ],
+      "explanation": "Large input values can cause activation functions (especially sigmoid/tanh) to saturate, leading to vanishing gradients. Normalizing to [0, 1] keeps values in a range where gradients flow well and training is stable.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "What does one-hot encoding accomplish for the MNIST labels?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Converts single digit labels into 10-dimensional probability vectors",
+      "options": [
+        "Compresses the labels to save space",
+        "Converts single digit labels into 10-dimensional probability vectors",
+        "Makes the labels easier to read",
+        "Speeds up training"
+      ],
+      "explanation": "One-hot encoding transforms a single label (e.g., 3) into a vector [0,0,0,1,0,0,0,0,0,0] where only the correct class has value 1. This matches the softmax output format and enables proper cross-entropy loss calculation.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "For MNIST with architecture [784, 128, 64, 10], approximately how many parameters does the network have?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Around 109,000",
+      "options": [
+        "Around 1,000",
+        "Around 10,000",
+        "Around 109,000",
+        "Around 1,000,000"
+      ],
+      "explanation": "Parameters = (784×128 + 128) + (128×64 + 64) + (64×10 + 10) = 100,352 + 8,192 + 650 = 109,194. The bulk comes from the first layer connecting 784 inputs to 128 hidden units.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "Why use cross-entropy loss instead of mean squared error for MNIST classification?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Cross-entropy provides better gradients for probability outputs and penalizes confident wrong predictions more",
+      "options": [
+        "Cross-entropy is faster to compute",
+        "MSE doesn't work with neural networks",
+        "Cross-entropy provides better gradients for probability outputs and penalizes confident wrong predictions more",
+        "Cross-entropy uses less memory"
+      ],
+      "explanation": "Cross-entropy loss is designed for probability distributions. It heavily penalizes confident wrong predictions (log of small probability = large negative value) and provides strong gradients even when the model is very wrong, unlike MSE which can have vanishing gradients.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "What is the purpose of using dropout during training but not during testing?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Dropout prevents overfitting during training; at test time we want the full model's performance",
+      "options": [
+        "Testing is faster without dropout",
+        "Dropout prevents overfitting during training; at test time we want the full model's performance",
+        "Dropout only works with training data",
+        "It's a bug if dropout is used during testing"
+      ],
+      "explanation": "Dropout randomly deactivates neurons during training to prevent co-adaptation and overfitting. During testing, we use all neurons (with appropriate scaling) to get the best performance from the full ensemble of learned features.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "Which digits are typically most confused with each other in MNIST?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "4 and 9, 3 and 8, 5 and 6",
+      "options": [
+        "0 and 1, 2 and 3",
+        "4 and 9, 3 and 8, 5 and 6",
+        "1 and 7, 0 and 8",
+        "All digits are equally confused"
+      ],
+      "explanation": "Digits with similar shapes are often confused: 4 and 9 (vertical line with top portion), 3 and 8 (similar curves), 5 and 6 (curved top). The confusion matrix typically shows these pairs having higher off-diagonal values.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "What do the weights in the first layer of an MNIST network typically learn to detect?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Edge detectors and simple stroke patterns",
+      "options": [
+        "Complete digit templates",
+        "Random noise patterns",
+        "Edge detectors and simple stroke patterns",
+        "Color information"
+      ],
+      "explanation": "First layer weights typically learn to detect basic features like edges, strokes, and simple curves. When visualized, they often look like parts of digits - vertical lines, horizontal lines, curves, and corners that combine in later layers to recognize full digits.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "Why shuffle the training data at the beginning of each epoch?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "To prevent the network from learning the order of examples and ensure varied mini-batches",
+      "options": [
+        "To make training faster",
+        "To prevent the network from learning the order of examples and ensure varied mini-batches",
+        "To reduce memory usage",
+        "It's not necessary, just tradition"
+      ],
+      "explanation": "Shuffling prevents the network from memorizing the order of training examples and ensures that each mini-batch contains a good mix of different digits. Without shuffling, the network might learn spurious patterns related to data order rather than actual features.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "What indicates your MNIST model is overfitting?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Training accuracy near 100% but validation accuracy stuck at 95%",
+      "options": [
+        "Both training and validation accuracy are low",
+        "Training accuracy near 100% but validation accuracy stuck at 95%",
+        "Validation accuracy higher than training accuracy",
+        "Training loss increasing over time"
+      ],
+      "explanation": "Overfitting is characterized by excellent performance on training data but significantly worse performance on validation data. A large gap between training accuracy (near 100%) and validation accuracy (95%) indicates the model has memorized training examples rather than learning generalizable patterns.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "What is a reasonable test accuracy expectation for a well-tuned MNIST classifier?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "97-99%",
+      "options": ["70-80%", "85-90%", "97-99%", "100%"],
+      "explanation": "A well-implemented and trained neural network should achieve 97-99% test accuracy on MNIST. Simple 2-3 layer networks typically get 97-98%, while more sophisticated approaches can reach 99%+. Below 95% suggests implementation issues.",
+      "orderIndex": 10
+    }
+  ]
+}

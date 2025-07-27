@@ -1,0 +1,137 @@
+{
+  "title": "Introduction to PyTorch Quiz",
+  "description": "Test your understanding of PyTorch fundamentals and core concepts",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What are the three main components that PyTorch provides?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Tensor library, automatic differentiation, and neural network modules",
+      "options": [
+        "Arrays, loops, and functions",
+        "Tensor library, automatic differentiation, and neural network modules",
+        "GPU support, CPU support, and memory management",
+        "Data loading, visualization, and model deployment"
+      ],
+      "explanation": "PyTorch provides three core components: (1) A tensor library similar to NumPy but with GPU support, (2) Automatic differentiation (autograd) for computing gradients, and (3) Neural network modules (nn) for building models. These three work together to make deep learning development efficient.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "What does setting requires_grad=True on a tensor do?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Tells PyTorch to track operations on this tensor for gradient computation",
+      "options": [
+        "Makes the tensor immutable",
+        "Moves the tensor to GPU",
+        "Tells PyTorch to track operations on this tensor for gradient computation",
+        "Requires the user to manually compute gradients"
+      ],
+      "explanation": "When requires_grad=True, PyTorch tracks all operations performed on that tensor, building a computational graph. This allows automatic gradient computation when .backward() is called. It's essential for parameters that need to be updated during training.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "What happens when you call .backward() on a tensor?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "PyTorch computes gradients for all tensors with requires_grad=True",
+      "options": [
+        "The tensor's values are reversed",
+        "PyTorch computes gradients for all tensors with requires_grad=True",
+        "The model runs in reverse to generate inputs",
+        "The tensor is moved to CPU"
+      ],
+      "explanation": "Calling .backward() triggers automatic differentiation. PyTorch traverses the computational graph backward from the tensor, computing gradients with respect to all tensors that have requires_grad=True. These gradients are stored in each tensor's .grad attribute.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "Why do we need to call optimizer.zero_grad() before each training step?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Because PyTorch accumulates gradients by default",
+      "options": [
+        "To reset the model weights to zero",
+        "To clear GPU memory",
+        "Because PyTorch accumulates gradients by default",
+        "To initialize the optimizer"
+      ],
+      "explanation": "PyTorch accumulates gradients in .grad attributes by default. This is useful for some scenarios but typically we want fresh gradients for each batch. Calling optimizer.zero_grad() clears the old gradients before computing new ones with .backward().",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "What is a computational graph in PyTorch?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "A dynamic graph tracking operations and tensors for automatic differentiation",
+      "options": [
+        "A visualization of the neural network architecture",
+        "A static graph defined before training",
+        "A dynamic graph tracking operations and tensors for automatic differentiation",
+        "A graph showing training loss over time"
+      ],
+      "explanation": "PyTorch builds a dynamic computational graph that tracks all operations performed on tensors with requires_grad=True. This graph is used during backpropagation to automatically compute gradients using the chain rule. It's rebuilt on each forward pass, allowing dynamic architectures.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "How do you move a model and data to GPU in PyTorch?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Use .to(device) or .cuda() on both model and tensors",
+      "options": [
+        "PyTorch automatically uses GPU if available",
+        "Use .to(device) or .cuda() on both model and tensors",
+        "Only the model needs to be moved to GPU",
+        "Set use_gpu=True when creating tensors"
+      ],
+      "explanation": "Both model and data must be on the same device. Use model.to(device) and tensor.to(device) where device is torch.device('cuda') for GPU or 'cpu' for CPU. Alternatively, use .cuda() to move to GPU. Operations between tensors on different devices will cause errors.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "What is the correct order of operations in a typical PyTorch training loop?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Forward pass → Compute loss → Zero gradients → Backward pass → Optimizer step",
+      "options": [
+        "Backward pass → Forward pass → Optimizer step → Compute loss",
+        "Zero gradients → Optimizer step → Forward pass → Backward pass",
+        "Forward pass → Compute loss → Zero gradients → Backward pass → Optimizer step",
+        "Compute loss → Forward pass → Backward pass → Zero gradients"
+      ],
+      "explanation": "The standard training loop follows this order: (1) Forward pass to get predictions, (2) Compute loss, (3) Zero gradients from previous step, (4) Backward pass to compute new gradients, (5) Optimizer step to update weights. This order ensures correct gradient computation and weight updates.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "What does model.eval() do in PyTorch?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Sets the model to evaluation mode, affecting dropout and batch normalization",
+      "options": [
+        "Evaluates the model's accuracy",
+        "Sets the model to evaluation mode, affecting dropout and batch normalization",
+        "Prevents gradient computation",
+        "Loads the best model weights"
+      ],
+      "explanation": "model.eval() switches the model to evaluation mode. This changes the behavior of certain layers like dropout (which is turned off) and batch normalization (which uses running statistics instead of batch statistics). Use it during validation/testing, often with torch.no_grad() to save memory.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "What is the main advantage of PyTorch's dynamic computational graph?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "You can use normal Python control flow (if/else, loops) in your models",
+      "options": [
+        "It's faster than static graphs",
+        "It uses less memory",
+        "You can use normal Python control flow (if/else, loops) in your models",
+        "It works better on GPU"
+      ],
+      "explanation": "PyTorch's dynamic graphs are rebuilt on each forward pass, allowing you to use regular Python control flow. You can have different architectures for different inputs, use loops with varying iterations, or conditional branches. This makes PyTorch very flexible and Pythonic.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "When should you use torch.no_grad()?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "During inference or when you don't need gradients",
+      "options": [
+        "When training the model",
+        "During inference or when you don't need gradients",
+        "To prevent the model from learning",
+        "When moving tensors to GPU"
+      ],
+      "explanation": "Use torch.no_grad() when you don't need gradient computation, typically during inference/evaluation. It prevents PyTorch from building the computational graph and storing intermediate values needed for backprop, saving memory and computation. Common in validation loops and when making predictions.",
+      "orderIndex": 10
+    }
+  ]
+}

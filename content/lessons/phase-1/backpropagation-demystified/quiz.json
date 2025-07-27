@@ -1,0 +1,137 @@
+{
+  "title": "Backpropagation Demystified Quiz",
+  "description": "Test your understanding of backpropagation, gradient flow, and the algorithm that powers deep learning",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What is the core mathematical principle behind backpropagation?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The chain rule of calculus",
+      "options": [
+        "The product rule",
+        "The chain rule of calculus",
+        "Linear algebra",
+        "The quotient rule"
+      ],
+      "explanation": "Backpropagation is essentially the chain rule applied systematically through a neural network. It allows us to compute how the loss changes with respect to each weight by multiplying gradients through the network layers.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "During the forward pass of backpropagation, what must we save?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "All intermediate activations and pre-activation values",
+      "options": [
+        "Only the final output",
+        "Only the weights",
+        "All intermediate activations and pre-activation values",
+        "Nothing needs to be saved"
+      ],
+      "explanation": "We must save all intermediate values (Z and A for each layer) during the forward pass because we need them to compute gradients during the backward pass.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "In which direction do gradients flow during backpropagation?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "From output layer to input layer",
+      "options": [
+        "From input layer to output layer",
+        "From output layer to input layer",
+        "Both directions simultaneously",
+        "Randomly between layers"
+      ],
+      "explanation": "Gradients flow backward from the output layer (where we compute the loss) through hidden layers to the input layer, hence the name 'backpropagation'.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "If you have a network with sigmoid activations and 10 layers, what problem are you likely to encounter?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Vanishing gradients",
+      "options": [
+        "Exploding gradients",
+        "Vanishing gradients",
+        "Overfitting",
+        "Slow inference"
+      ],
+      "explanation": "Sigmoid derivatives are at most 0.25. When multiplied through many layers (0.25^10 ≈ 0.000001), gradients become extremely small, causing the vanishing gradient problem.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "When computing dW (gradient with respect to weights), what do we multiply?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The layer's input activations and the gradient from the next layer",
+      "options": [
+        "The weights and biases",
+        "The layer's input activations and the gradient from the next layer",
+        "Only the gradient from the next layer",
+        "The learning rate and the weights"
+      ],
+      "explanation": "The gradient with respect to weights is computed as: dW = (gradient from next layer) × (input activations).T. This follows from the chain rule.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "Why is ReLU preferred over sigmoid for deep networks?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "ReLU has a constant gradient of 1 for positive inputs",
+      "options": [
+        "ReLU is faster to compute",
+        "ReLU has a constant gradient of 1 for positive inputs",
+        "ReLU outputs are bounded",
+        "ReLU uses less memory"
+      ],
+      "explanation": "ReLU's derivative is 1 for positive inputs and 0 for negative inputs. This constant gradient of 1 prevents vanishing gradients in deep networks, unlike sigmoid which has small derivatives.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "What is gradient clipping used for?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Preventing exploding gradients",
+      "options": [
+        "Making training faster",
+        "Preventing exploding gradients",
+        "Reducing memory usage",
+        "Preventing vanishing gradients"
+      ],
+      "explanation": "Gradient clipping caps the maximum gradient magnitude to prevent exploding gradients, which can cause training instability and NaN values in deep networks.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "In batch backpropagation, how do we handle gradients from multiple examples?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Average the gradients across the batch",
+      "options": [
+        "Use only the first example",
+        "Average the gradients across the batch",
+        "Sum all gradients without averaging",
+        "Pick the largest gradient"
+      ],
+      "explanation": "When processing a batch, we average the gradients from all examples. This gives us a more stable estimate of the true gradient and enables efficient parallel computation.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "What makes backpropagation computationally efficient?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "It computes all gradients in one backward pass",
+      "options": [
+        "It only computes some gradients",
+        "It computes all gradients in one backward pass",
+        "It uses approximations",
+        "It skips unnecessary layers"
+      ],
+      "explanation": "Backpropagation efficiently computes gradients for all parameters in just one backward pass through the network, reusing intermediate computations. Without it, we'd need O(n²) operations.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "In the gradient flow equation dL/dW1 = dL/dA3 × dA3/dA2 × dA2/dA1 × dA1/dW1, what does each term represent?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "How each layer's output affects the next, chained together",
+      "options": [
+        "Random scaling factors",
+        "Learning rates for each layer",
+        "How each layer's output affects the next, chained together",
+        "The weights of each layer"
+      ],
+      "explanation": "Each term represents a local gradient - how one layer's output affects the next. The chain rule multiplies these together to get the total effect on the loss.",
+      "orderIndex": 10
+    }
+  ]
+}

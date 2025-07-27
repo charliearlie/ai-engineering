@@ -1,0 +1,137 @@
+{
+  "title": "Optimization and Learning Quiz",
+  "description": "Test your understanding of optimizers, learning rates, and training strategies",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What is the main problem with using a fixed learning rate throughout training?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "It's too large for fine-tuning and too small for initial exploration",
+      "options": [
+        "It uses too much memory",
+        "It's too large for fine-tuning and too small for initial exploration",
+        "It makes training slower",
+        "It only works with certain optimizers"
+      ],
+      "explanation": "A fixed learning rate that's good for initial exploration (large) will overshoot during fine-tuning. A rate good for fine-tuning (small) will make initial progress very slow. This is why learning rate schedules are useful.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "How does momentum help with optimization?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "It smooths the path and helps escape shallow local minima",
+      "options": [
+        "It makes computations faster",
+        "It reduces memory usage",
+        "It smooths the path and helps escape shallow local minima",
+        "It guarantees finding the global minimum"
+      ],
+      "explanation": "Momentum accumulates gradients over time, like a ball rolling downhill. This smooths out zigzagging paths and provides enough 'velocity' to roll over small bumps (shallow local minima).",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "What is the key innovation of adaptive learning rate methods like AdaGrad?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Different parameters get different learning rates based on their gradient history",
+      "options": [
+        "They use momentum",
+        "Different parameters get different learning rates based on their gradient history",
+        "They change the batch size automatically",
+        "They prevent overfitting"
+      ],
+      "explanation": "Adaptive methods track gradient history for each parameter. Parameters with large/frequent gradients get smaller learning rates, while parameters with small/rare gradients get larger rates. This handles features with different scales.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "Why does Adam optimizer include bias correction?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "To fix the initialization bias when momentum starts at zero",
+      "options": [
+        "To prevent overfitting",
+        "To fix the initialization bias when momentum starts at zero",
+        "To make it work with biased datasets",
+        "To reduce computational cost"
+      ],
+      "explanation": "Adam's momentum terms (first and second moments) are initialized at zero, which biases them toward zero early in training. Bias correction divides by (1 - β^t) to counteract this initialization bias.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "What is the typical range for mini-batch sizes in practice?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "32-256 examples",
+      "options": [
+        "1-10 examples",
+        "32-256 examples",
+        "1000-10000 examples",
+        "Always use the full dataset"
+      ],
+      "explanation": "Mini-batches of 32-256 examples provide a good balance: enough examples for stable gradients and efficient GPU utilization, but small enough to fit in memory and provide some beneficial noise.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "What happens when gradients become very large during training?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Exploding gradients - parameters update too much and training becomes unstable",
+      "options": [
+        "Training becomes more accurate",
+        "Vanishing gradients occur",
+        "Exploding gradients - parameters update too much and training becomes unstable",
+        "The model converges faster"
+      ],
+      "explanation": "Exploding gradients cause huge parameter updates that can make weights overflow to infinity or NaN. This is often solved with gradient clipping, which caps the maximum gradient magnitude.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "Which learning rate schedule gradually reduces the learning rate following a smooth curve?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Exponential decay and cosine annealing",
+      "options": [
+        "Step decay only",
+        "Constant learning rate",
+        "Exponential decay and cosine annealing",
+        "Random scheduling"
+      ],
+      "explanation": "Exponential decay smoothly decreases the learning rate as lr = initial_lr × decay_rate^epoch. Cosine annealing follows a cosine curve. Step decay drops suddenly at specific epochs.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "What is the main advantage of using larger batch sizes?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "More stable gradients and better GPU utilization",
+      "options": [
+        "Better final accuracy",
+        "More stable gradients and better GPU utilization",
+        "Ability to escape local minima",
+        "Lower memory usage"
+      ],
+      "explanation": "Larger batches provide more stable gradient estimates (less noise) and better utilize GPU parallel processing. However, they may get stuck in sharp minima and actually use more memory.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "What problem does RMSprop solve that AdaGrad has?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "AdaGrad's learning rate decreases monotonically and can stop learning",
+      "options": [
+        "AdaGrad is too slow",
+        "AdaGrad uses too much memory",
+        "AdaGrad's learning rate decreases monotonically and can stop learning",
+        "AdaGrad doesn't work with momentum"
+      ],
+      "explanation": "AdaGrad accumulates all squared gradients, so the learning rate always decreases and eventually becomes too small. RMSprop uses an exponential moving average instead, allowing the learning rate to increase if gradients become smaller.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "For a beginner starting to train neural networks, which optimizer is typically recommended?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Adam with default parameters",
+      "options": [
+        "Basic gradient descent",
+        "Adam with default parameters",
+        "AdaGrad",
+        "SGD with carefully tuned learning rate"
+      ],
+      "explanation": "Adam is recommended for beginners because it works well 'out of the box' with default parameters (lr=0.001, β1=0.9, β2=0.999). It combines the benefits of momentum and adaptive learning rates.",
+      "orderIndex": 10
+    }
+  ]
+}

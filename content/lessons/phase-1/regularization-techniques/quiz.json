@@ -1,0 +1,137 @@
+{
+  "title": "Regularization Techniques Quiz",
+  "description": "Test your understanding of overfitting prevention and regularization methods",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What is the key difference between a model that memorizes training data versus one that learns patterns?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Memorization works on training data but fails on new data, pattern learning generalizes",
+      "options": [
+        "Memorization is faster to train",
+        "Pattern learning uses more memory",
+        "Memorization works on training data but fails on new data, pattern learning generalizes",
+        "There is no practical difference"
+      ],
+      "explanation": "A model that memorizes performs perfectly on training data but poorly on new data. A model that learns patterns can generalize to unseen examples. This is the fundamental difference between overfitting and good generalization.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "How does L2 regularization prevent overfitting?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "It penalizes large weights, encouraging simpler functions",
+      "options": [
+        "It adds more training data",
+        "It penalizes large weights, encouraging simpler functions",
+        "It stops training early",
+        "It removes features from the model"
+      ],
+      "explanation": "L2 regularization adds a penalty term (λ × Σw²) to the loss function. This discourages large weights, which tend to create complex, overfitted functions. Smaller weights lead to smoother, simpler functions that generalize better.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "What is the main difference between L1 and L2 regularization?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "L1 creates sparse weights (many zeros), L2 creates small weights",
+      "options": [
+        "L1 is faster to compute",
+        "L2 only works with neural networks",
+        "L1 creates sparse weights (many zeros), L2 creates small weights",
+        "They are mathematically identical"
+      ],
+      "explanation": "L1 regularization (using absolute values) tends to push weights to exactly zero, creating sparse models. L2 regularization (using squared values) makes weights small but not zero. This makes L1 useful for feature selection.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "During training with dropout rate 0.5, what happens to the neurons?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "50% of neurons are randomly set to zero each forward pass",
+      "options": [
+        "The weakest 50% of neurons are removed permanently",
+        "50% of neurons are randomly set to zero each forward pass",
+        "All neurons have their outputs reduced by 50%",
+        "50% of the weights are set to zero"
+      ],
+      "explanation": "Dropout randomly deactivates neurons (sets output to 0) during each training step. With rate 0.5, each neuron has a 50% chance of being dropped. Different neurons drop out each time, forcing the network to learn redundant representations.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "Why do we scale neuron outputs when using dropout?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "To maintain the same expected output value during training and testing",
+      "options": [
+        "To make training faster",
+        "To maintain the same expected output value during training and testing",
+        "To prevent gradient explosion",
+        "To save memory"
+      ],
+      "explanation": "During training with dropout rate p, only (1-p) fraction of neurons are active. We scale by 1/(1-p) so the expected sum remains the same. This ensures consistent behavior between training (with dropout) and testing (without dropout).",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "What is the 'patience' parameter in early stopping?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Number of epochs to wait for improvement before stopping",
+      "options": [
+        "The minimum loss value to achieve",
+        "Number of epochs to wait for improvement before stopping",
+        "The learning rate decay factor",
+        "Maximum number of training epochs"
+      ],
+      "explanation": "Patience is how many epochs to continue training without improvement in validation loss before stopping. It prevents stopping too early due to temporary fluctuations while still avoiding overfitting.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "Which data augmentation would be appropriate for digit recognition?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Small rotations and translations",
+      "options": [
+        "Horizontal flipping",
+        "Small rotations and translations",
+        "Color inversion",
+        "Extreme zooming"
+      ],
+      "explanation": "Small rotations and translations preserve digit identity while creating variety. Horizontal flipping would turn 6 into 9. Color inversion might work but isn't typical for digits. Extreme zooming could lose important parts of the digit.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "What indicates that you're using too much regularization?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Both training and validation accuracy are low",
+      "options": [
+        "Training accuracy is perfect",
+        "Both training and validation accuracy are low",
+        "Validation accuracy is higher than training",
+        "Training is very fast"
+      ],
+      "explanation": "Too much regularization leads to underfitting - the model can't even fit the training data well. You'll see low accuracy on both training and validation sets because the model is too constrained to learn the patterns.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "Why is batch normalization considered to have regularization effects?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The batch statistics add noise that prevents overfitting",
+      "options": [
+        "It reduces the number of parameters",
+        "The batch statistics add noise that prevents overfitting",
+        "It makes weights exactly zero",
+        "It stops training early"
+      ],
+      "explanation": "Batch normalization uses statistics (mean, variance) computed on mini-batches. These statistics vary between batches, adding noise to the training process. This noise acts as a form of regularization, similar to dropout.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "When should you typically add regularization to your model?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "When validation loss starts increasing while training loss decreases",
+      "options": [
+        "Always from the beginning",
+        "When validation loss starts increasing while training loss decreases",
+        "Only for small datasets",
+        "When training is too slow"
+      ],
+      "explanation": "The classic sign of overfitting is when training loss continues to decrease but validation loss starts to increase. This divergence indicates the model is memorizing training data rather than learning generalizable patterns - time to add regularization!",
+      "orderIndex": 10
+    }
+  ]
+}

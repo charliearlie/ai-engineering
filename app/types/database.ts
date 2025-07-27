@@ -8,6 +8,7 @@ import type {
   difficultyEnum,
   userProgressStatusEnum,
   questionTypeEnum,
+  phaseEnum,
 } from '@/src/db/schema';
 
 export type Lesson = InferSelectModel<typeof lessons>;
@@ -28,6 +29,7 @@ export type NewQuizAttempt = InferInsertModel<typeof quizAttempts>;
 export type Difficulty = typeof difficultyEnum.enumValues[number];
 export type UserProgressStatus = typeof userProgressStatusEnum.enumValues[number];
 export type QuestionType = typeof questionTypeEnum.enumValues[number];
+export type Phase = typeof phaseEnum.enumValues[number];
 
 export type LessonWithQuiz = Lesson & {
   quiz?: Quiz;
@@ -70,10 +72,17 @@ export interface QuizResult {
   explanations: Record<string, string>;
 }
 
+export type LessonWithPrerequisites = Lesson & {
+  prerequisiteDetails?: Lesson[];
+  prerequisitesMet?: boolean;
+};
+
 export interface LessonFilter {
   difficulty?: Difficulty;
   status?: UserProgressStatus;
   userId?: string;
+  phase?: Phase;
+  orderBy?: 'lessonNumber' | 'difficulty' | 'title';
 }
 
 export interface UserLearningStats {

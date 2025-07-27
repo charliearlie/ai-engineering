@@ -22,14 +22,43 @@ import type {
   QuizResult,
   LessonFilter,
   UserLearningStats,
+  Phase,
 } from '@/app/types/database';
 
 export async function getAllLessons(filter?: LessonFilter): Promise<LessonWithQuiz[]> {
   try {
-    // Build the lesson query based on filters
-    const lessonsResult = filter?.difficulty
-      ? await db.select().from(lessons).where(eq(lessons.difficulty, filter.difficulty)).orderBy(asc(lessons.orderIndex))
-      : await db.select().from(lessons).orderBy(asc(lessons.orderIndex));
+    // Build the query with filters
+    let query = db.select().from(lessons);
+    
+    // Apply filters
+    const conditions = [];
+    if (filter?.difficulty) {
+      conditions.push(eq(lessons.difficulty, filter.difficulty));
+    }
+    if (filter?.phase) {
+      conditions.push(eq(lessons.phase, filter.phase));
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+    
+    // Apply ordering
+    const orderBy = filter?.orderBy || 'lessonNumber';
+    switch (orderBy) {
+      case 'difficulty':
+        query = query.orderBy(asc(lessons.difficulty), asc(lessons.lessonNumber));
+        break;
+      case 'title':
+        query = query.orderBy(asc(lessons.title));
+        break;
+      case 'lessonNumber':
+      default:
+        query = query.orderBy(asc(lessons.lessonNumber));
+        break;
+    }
+    
+    const lessonsResult = await query;
     
     // Get quizzes for these lessons
     const lessonIds = lessonsResult.map(lesson => lesson.id);
@@ -67,6 +96,63 @@ export async function getLessonBySlug(slug: string): Promise<LessonWithQuiz | nu
   } catch (error) {
     console.error('Error fetching lesson by slug:', error);
     throw new Error('Failed to fetch lesson');
+  }
+}
+
+export async function getLessonsByPhase(phase: Phase): Promise<LessonWithQuiz[]> {
+  try {
+    return await getAllLessons({ phase, orderBy: 'lessonNumber' });
+  } catch (error) {
+    console.error('Error fetching lessons by phase:', error);
+    throw new Error('Failed to fetch lessons by phase');
+  }
+}
+
+export async function getLessonPrerequisites(lessonNumber: number): Promise<Lesson[]> {
+  try {
+    const lesson = await db
+      .select()
+      .from(lessons)
+      .where(eq(lessons.lessonNumber, lessonNumber))
+      .limit(1);
+
+    if (lesson.length === 0) return [];
+
+    const prerequisiteNumbers = lesson[0].prerequisites;
+    if (prerequisiteNumbers.length === 0) return [];
+
+    const prerequisites = await db
+      .select()
+      .from(lessons)
+      .where(inArray(lessons.lessonNumber, prerequisiteNumbers))
+      .orderBy(asc(lessons.lessonNumber));
+
+    return prerequisites;
+  } catch (error) {
+    console.error('Error fetching lesson prerequisites:', error);
+    throw new Error('Failed to fetch lesson prerequisites');
+  }
+}
+
+export async function checkPrerequisitesMet(lessonNumber: number, userId: string): Promise<boolean> {
+  try {
+    const prerequisites = await getLessonPrerequisites(lessonNumber);
+    if (prerequisites.length === 0) return true;
+
+    const prerequisiteIds = prerequisites.map(p => p.id);
+    const completedProgress = await db
+      .select()
+      .from(userProgress)
+      .where(and(
+        eq(userProgress.userId, userId),
+        inArray(userProgress.lessonId, prerequisiteIds),
+        eq(userProgress.status, 'completed')
+      ));
+
+    return completedProgress.length === prerequisites.length;
+  } catch (error) {
+    console.error('Error checking prerequisites:', error);
+    throw new Error('Failed to check prerequisites');
   }
 }
 
@@ -322,7 +408,7 @@ export async function getNextLesson(currentLessonId: string): Promise<Lesson | n
     const nextLesson = await db
       .select()
       .from(lessons)
-      .where(eq(lessons.orderIndex, currentLesson[0].orderIndex + 1))
+      .where(eq(lessons.lessonNumber, currentLesson[0].lessonNumber + 1))
       .limit(1);
 
     return nextLesson[0] || null;
@@ -345,7 +431,7 @@ export async function getPreviousLesson(currentLessonId: string): Promise<Lesson
     const previousLesson = await db
       .select()
       .from(lessons)
-      .where(eq(lessons.orderIndex, currentLesson[0].orderIndex - 1))
+      .where(eq(lessons.lessonNumber, currentLesson[0].lessonNumber - 1))
       .limit(1);
 
     return previousLesson[0] || null;

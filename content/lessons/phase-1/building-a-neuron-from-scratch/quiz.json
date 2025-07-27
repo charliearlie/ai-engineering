@@ -1,0 +1,122 @@
+{
+  "title": "Building a Neuron from Scratch Quiz",
+  "description": "Test your understanding of neuron components, activation functions, and the learning process",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What is the correct order of operations in a neuron's forward pass?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Inputs × Weights + Bias → Activation Function → Output",
+      "options": [
+        "Inputs × Weights + Bias → Activation Function → Output",
+        "Activation Function → Inputs × Weights → Add Bias → Output",
+        "Inputs + Bias → Multiply Weights → Activation Function → Output",
+        "Weights × Bias → Add Inputs → Activation Function → Output"
+      ],
+      "explanation": "A neuron first computes the weighted sum of inputs plus bias (linear combination), then applies the activation function to produce the final output.",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "What is the main purpose of an activation function?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "To add non-linearity so neurons can learn complex patterns",
+      "options": [
+        "To make computations faster",
+        "To add non-linearity so neurons can learn complex patterns",
+        "To reduce the size of the output",
+        "To initialize weights properly"
+      ],
+      "explanation": "Without activation functions, neurons could only learn linear relationships. Activation functions add non-linearity, enabling neural networks to learn complex, curved decision boundaries.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "Which activation function outputs values between 0 and 1?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Sigmoid",
+      "options": ["ReLU", "Sigmoid", "Tanh", "Linear"],
+      "explanation": "Sigmoid squashes any input to a value between 0 and 1, making it useful for binary classification and probability outputs.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "If a neuron has weights [0.5, -0.3], bias 0.1, and inputs [2, 1], what is the pre-activation value?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "0.8",
+      "options": ["0.8", "0.7", "1.4", "0.4"],
+      "explanation": "Pre-activation = (0.5 × 2) + (-0.3 × 1) + 0.1 = 1.0 - 0.3 + 0.1 = 0.8",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "What does ReLU (Rectified Linear Unit) do to negative inputs?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Sets them to zero",
+      "options": [
+        "Squares them",
+        "Sets them to zero",
+        "Makes them positive",
+        "Reduces them by half"
+      ],
+      "explanation": "ReLU is defined as max(0, x). It passes positive values unchanged but sets all negative values to zero, acting like a gate that only lets positive signals through.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "During backpropagation, what do we calculate for each weight?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "How much that weight contributed to the error",
+      "options": [
+        "The new random value for the weight",
+        "How much that weight contributed to the error",
+        "The average of all weights",
+        "The maximum possible weight value"
+      ],
+      "explanation": "Backpropagation calculates gradients - how much each weight contributed to the error. Weights that contributed more to the error will receive larger updates.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "Why should initial weights be small random values instead of all zeros?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "All zeros would prevent the neuron from learning different features",
+      "options": [
+        "Zero weights use too much memory",
+        "All zeros would prevent the neuron from learning different features",
+        "Random values compute faster",
+        "It's just a convention with no real purpose"
+      ],
+      "explanation": "If all weights start at zero, all neurons would compute the same output and receive the same gradient updates, preventing them from learning different features. Small random values break this symmetry.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "What is the typical range for learning rates?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "0.001 to 0.1",
+      "options": ["10 to 100", "0.001 to 0.1", "1 to 10", "-1 to 1"],
+      "explanation": "Learning rates are typically small positive values between 0.001 and 0.1. Too large and training becomes unstable; too small and training takes forever.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "A neuron trained on AND gate data learned weights [5.2, 5.1] and bias -7.8. Why is the bias negative and large?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "To ensure output is 0 unless both inputs are 1",
+      "options": [
+        "It's a training error",
+        "To ensure output is 0 unless both inputs are 1",
+        "To make computations faster",
+        "Negative bias means better accuracy"
+      ],
+      "explanation": "For AND gate, the neuron needs to output 1 only when both inputs are 1. The large negative bias (-7.8) ensures the neuron stays 'off' unless both inputs provide enough positive signal to overcome it.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "What advantage does tanh activation have over sigmoid?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Outputs are centered around zero instead of 0.5",
+      "options": [
+        "It's faster to compute",
+        "Outputs are centered around zero instead of 0.5",
+        "It can output values greater than 1",
+        "It prevents overfitting better"
+      ],
+      "explanation": "Tanh outputs range from -1 to 1 with zero input giving zero output. This zero-centered property often leads to faster convergence compared to sigmoid's 0.5-centered output.",
+      "orderIndex": 10
+    }
+  ]
+}

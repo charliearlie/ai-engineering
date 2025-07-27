@@ -7,12 +7,18 @@ export const userProgressStatusEnum = pgEnum('user_progress_status', ['not_start
 
 export const questionTypeEnum = pgEnum('question_type', ['multiple_choice', 'true_false']);
 
+export const phaseEnum = pgEnum('phase', ['foundations', 'modern-architectures', 'ai-engineering']);
+
 export const lessons = pgTable('lessons', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: text('title').notNull(),
   description: text('description').notNull(),
   slug: text('slug').notNull().unique(),
   orderIndex: integer('order_index').notNull(),
+  lessonNumber: integer('lesson_number').notNull().unique(),
+  phase: phaseEnum('phase').notNull(),
+  phaseOrder: integer('phase_order').notNull(),
+  prerequisites: integer('prerequisites').array().notNull().default([]),
   difficulty: difficultyEnum('difficulty').notNull().default('beginner'),
   estimatedMinutes: integer('estimated_minutes'),
   markdownPath: text('markdown_path').notNull(),
