@@ -1,0 +1,137 @@
+{
+  "title": "Convolutional Neural Networks Quiz",
+  "description": "Test your understanding of CNNs and computer vision fundamentals",
+  "passingScore": 70,
+  "questions": [
+    {
+      "questionText": "What is the main advantage of CNNs over fully connected networks for image processing?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Weight sharing and local connectivity reduce parameters dramatically",
+      "options": [
+        "CNNs are faster to train",
+        "CNNs use more parameters for better accuracy",
+        "Weight sharing and local connectivity reduce parameters dramatically",
+        "CNNs only work with black and white images"
+      ],
+      "explanation": "CNNs use weight sharing (same filter across the entire image) and local connectivity (neurons only connect to small regions). This reduces parameters from millions to thousands while maintaining the ability to detect features anywhere in the image. A 3x3 filter has only 9 weights regardless of image size!",
+      "orderIndex": 1
+    },
+    {
+      "questionText": "What does a convolution operation actually do?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Slides a filter across the image, computing dot products",
+      "options": [
+        "Rotates the image by a specified angle",
+        "Slides a filter across the image, computing dot products",
+        "Compresses the image to save memory",
+        "Converts the image to grayscale"
+      ],
+      "explanation": "Convolution slides a small filter (kernel) across the image. At each position, it computes the dot product between the filter weights and the image pixels, creating a feature map. This operation detects patterns like edges, corners, or textures depending on the filter values.",
+      "orderIndex": 2
+    },
+    {
+      "questionText": "Why do we use padding in CNNs?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "To preserve spatial dimensions and use edge pixels more",
+      "options": [
+        "To make images load faster",
+        "To add color to black and white images",
+        "To preserve spatial dimensions and use edge pixels more",
+        "To increase training speed"
+      ],
+      "explanation": "Padding adds zeros (or other values) around the image border. This serves two purposes: (1) It preserves spatial dimensions - without padding, images shrink with each convolution, (2) It ensures edge pixels are used as much as center pixels in feature detection.",
+      "orderIndex": 3
+    },
+    {
+      "questionText": "What happens when you increase stride in a convolution?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The output feature map becomes smaller",
+      "options": [
+        "The filter becomes larger",
+        "The output feature map becomes smaller",
+        "More parameters are added to the model",
+        "The image quality improves"
+      ],
+      "explanation": "Stride controls how many pixels the filter moves at each step. With stride=1, the filter moves one pixel at a time. With stride=2, it jumps two pixels, covering the image faster but producing a smaller output. This is useful for reducing dimensions without pooling.",
+      "orderIndex": 4
+    },
+    {
+      "questionText": "What is the purpose of max pooling?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Reduce spatial dimensions while keeping the strongest features",
+      "options": [
+        "Increase the number of features",
+        "Add more layers to the network",
+        "Reduce spatial dimensions while keeping the strongest features",
+        "Improve image resolution"
+      ],
+      "explanation": "Max pooling takes the maximum value in each pooling region (e.g., 2x2). This reduces spatial dimensions by keeping only the strongest activations. It provides translation invariance (small shifts don't change the output) and reduces computation in later layers.",
+      "orderIndex": 5
+    },
+    {
+      "questionText": "What is a receptive field in a CNN?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "The region of the input image that affects a particular neuron's output",
+      "options": [
+        "The size of the filter being used",
+        "The region of the input image that affects a particular neuron's output",
+        "The number of layers in the network",
+        "The learning rate of the optimizer"
+      ],
+      "explanation": "The receptive field is the area of the original input that influences a neuron's activation. It grows with network depth - early layers see small patches (like 3x3), while deep layers see large regions. This allows CNNs to build complex features from simple ones hierarchically.",
+      "orderIndex": 6
+    },
+    {
+      "questionText": "In a typical CNN architecture, why do we increase the number of filters in deeper layers?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Deeper layers detect more complex features requiring more filters",
+      "options": [
+        "To make the network train faster",
+        "Because images get larger in deeper layers",
+        "Deeper layers detect more complex features requiring more filters",
+        "To reduce overfitting"
+      ],
+      "explanation": "Early layers detect simple features (edges, colors) requiring few filters. Deeper layers combine these into complex features (eyes, wheels, faces) requiring more filters. As spatial dimensions decrease through pooling, we increase depth to maintain representational capacity.",
+      "orderIndex": 7
+    },
+    {
+      "questionText": "What does 'same' padding mean in a convolution layer?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Add enough padding so output size equals input size",
+      "options": [
+        "Use the same filter for all channels",
+        "Add enough padding so output size equals input size",
+        "Keep the same number of parameters",
+        "Use the same learning rate throughout"
+      ],
+      "explanation": "'Same' padding adds just enough zeros around the input so that the output spatial dimensions match the input (when stride=1). For a 3x3 filter, this means padding=1. For a 5x5 filter, padding=2. This is very useful for building deep networks.",
+      "orderIndex": 8
+    },
+    {
+      "questionText": "What innovation made ResNet able to train very deep networks (100+ layers)?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Skip connections that allow gradients to flow directly",
+      "options": [
+        "Larger filters in each layer",
+        "More pooling layers",
+        "Skip connections that allow gradients to flow directly",
+        "Smaller batch sizes"
+      ],
+      "explanation": "ResNet introduced skip (or residual) connections that add the input directly to the output of a block. This creates shortcuts for gradients during backpropagation, solving the vanishing gradient problem that prevented training very deep networks. Now networks with hundreds of layers are possible.",
+      "orderIndex": 9
+    },
+    {
+      "questionText": "Why is transfer learning particularly effective with CNNs?",
+      "questionType": "multiple_choice",
+      "correctAnswer": "Early layers learn general features useful across many vision tasks",
+      "options": [
+        "CNNs train faster than other networks",
+        "Early layers learn general features useful across many vision tasks",
+        "Transfer learning only works with CNNs",
+        "It reduces the size of the model"
+      ],
+      "explanation": "CNN early layers learn universal features like edges, textures, and shapes that are useful for any vision task. By using a CNN pre-trained on ImageNet, you get these feature detectors for free. You only need to retrain the final layers for your specific task, which works even with small datasets.",
+      "orderIndex": 10
+    }
+  ]
+}

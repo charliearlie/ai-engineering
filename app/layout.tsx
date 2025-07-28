@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/app/components/theme-provider";
 import { Providers } from "@/app/providers";
 import { Header } from "@/app/components/navigation/header";
+import { CustomClerkProvider } from "@/app/components/clerk-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,14 +32,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <Providers>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">
-                {children}
-              </main>
-            </div>
-          </Providers>
+          <CustomClerkProvider>
+            <Providers>
+              <div className="flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </div>
+            </Providers>
+          </CustomClerkProvider>
         </ThemeProvider>
       </body>
     </html>

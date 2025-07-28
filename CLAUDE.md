@@ -50,11 +50,20 @@ bun run lint         # Run ESLint
 
 ```
 /app/                 # Next.js App Router pages and layouts
-/components/          # Reusable React components (shadcn/ui components go in /ui)
-/lib/                 # Utility functions and configurations
+  /api/               # API route handlers (lessons, progress, quizzes)
+  /components/        # App-specific React components
+  /hooks/             # Custom React hooks
+  /lib/               # App-specific utilities and configurations
+  /stores/            # Zustand state stores
+  /types/             # TypeScript type definitions
+/components/          # Root-level reusable React components (shadcn/ui components in /ui)
+/content/             # Lesson markdown files organized by phases
+  /lessons/           # Structured lesson content (phase-1, phase-2, phase-3)
 /docs/                # Product requirements and technical documentation
-/content/             # (Planned) Lesson markdown files
+/lib/                 # Root-level utility functions and configurations
 /public/              # Static assets
+/src/                 # Source directory
+  /db/                # Database schema, migrations, and queries (Drizzle ORM)
 ```
 
 **Import Aliases** (configured in tsconfig.json and components.json):

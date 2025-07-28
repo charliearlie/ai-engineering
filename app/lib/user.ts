@@ -1,119 +1,107 @@
 /**
- * User ID management system for anonymous learning progress tracking
- * Uses localStorage to persist user identity across sessions
+ * User ID management system using Clerk authentication
+ * Replaces the previous localStorage-based system with reliable auth
  */
 
-const USER_ID_KEY = 'ai-engineering-user-id';
+import { auth } from '@clerk/nextjs/server';
+import { useAuth } from '@clerk/nextjs';
 
 /**
- * Generate a unique user ID with prefix
+ * Get the current user ID from Clerk authentication (server-side)
+ * @returns The authenticated user ID or null if not authenticated
  */
-function generateUserId(): string {
-  // Generate a UUID-like string
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2);
-  return `user-${timestamp}-${random}`;
-}
-
-/**
- * Get the current user ID, creating one if it doesn't exist
- * @returns The user ID string
- */
-export function getUserId(): string {
-  // Check if we're in a browser environment
-  if (typeof window === 'undefined') {
-    // Server-side: return a temporary ID
-    return 'server-user';
-  }
-
+export async function getUserId(): Promise<string | null> {
   try {
-    let userId = localStorage.getItem(USER_ID_KEY);
-    
-    if (!userId) {
-      userId = generateUserId();
-      localStorage.setItem(USER_ID_KEY, userId);
-    }
-    
+    const { userId } = await auth();
     return userId;
   } catch (error) {
-    // Fallback if localStorage is not available
-    console.warn('localStorage not available, using session-only user ID');
-    return generateUserId();
+    // Return null if auth() fails (e.g., no middleware protection)
+    return null;
   }
 }
 
 /**
- * Reset the user ID (useful for testing or starting fresh)
- * @returns The new user ID
+ * Get user ID for API calls - server-side helper
+ * @returns User ID from Clerk session
  */
-export function resetUserId(): string {
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.removeItem(USER_ID_KEY);
-    } catch (error) {
-      console.warn('Could not clear user ID from localStorage');
-    }
-  }
-  
-  return getUserId();
-}
-
-/**
- * Check if a user ID exists in localStorage
- * @returns True if user ID exists
- */
-export function hasUserId(): boolean {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  
+export async function getApiUserId(): Promise<string | null> {
   try {
-    return localStorage.getItem(USER_ID_KEY) !== null;
+    const { userId } = await auth();
+    return userId;
   } catch (error) {
-    return false;
+    // Return null if auth() fails (e.g., no middleware protection)
+    return null;
   }
 }
 
 /**
- * Get user ID for API calls - handles both client and server contexts
- * @param requestUserId Optional user ID from request headers/params
- * @returns User ID to use for the request
- */
-export function getApiUserId(requestUserId?: string): string {
-  // If explicitly provided, use it
-  if (requestUserId) {
-    return requestUserId;
-  }
-  
-  // Otherwise get from localStorage (client-side) or generate temporary (server-side)
-  return getUserId();
-}
-
-/**
- * Validate user ID format
+ * Validate user ID format (Clerk user IDs start with 'user_')
  * @param userId The user ID to validate
- * @returns True if valid format
+ * @returns True if valid Clerk user ID format
  */
-export function isValidUserId(userId: string): boolean {
+export function isValidUserId(userId: string | null): boolean {
   if (!userId || typeof userId !== 'string') {
     return false;
   }
   
-  // Check for our expected format: user-{timestamp}-{random} or server-user
-  const pattern = /^(user-[a-z0-9]+-[a-z0-9]+|server-user)$/;
-  return pattern.test(userId);
+  // Clerk user IDs have a specific format
+  return userId.startsWith('user_') && userId.length > 10;
 }
 
 /**
- * Hook for React components to use user ID
+ * Hook for React components to use user ID (client-side)
  * This ensures the user ID is available on the client side
  */
 export function useUserId() {
-  // For now, just return the user ID function
-  // In a real React app, this would be a proper hook with state
+  const { userId, isLoaded, isSignedIn } = useAuth();
+  
   return {
-    userId: getUserId(),
-    resetUserId,
-    hasUserId: hasUserId(),
+    userId,
+    isLoaded,
+    isSignedIn,
+    isValidUserId: isValidUserId(userId),
   };
+}
+
+/**
+ * Legacy support for localStorage migration
+ * This function checks if there's an old localStorage user ID
+ * that needs to be migrated to the new system
+ */
+export function getLegacyUserId(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  
+  try {
+    return localStorage.getItem('ai-engineering-user-id');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Clear legacy user ID after migration
+ */
+export function clearLegacyUserId(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  
+  try {
+    localStorage.removeItem('ai-engineering-user-id');
+  } catch {
+    // Ignore errors
+  }
+}
+
+/**
+ * Check if a lesson should be freely accessible without authentication
+ * Lesson 1 (introduction-to-neural-networks) is free as a selling point
+ * @param slug The lesson slug to check
+ * @returns True if the lesson should be freely accessible
+ */
+export function isLessonFreelyAccessible(slug: string): boolean {
+  // Lesson 1 "introduction-to-neural-networks" is free for all users (selling point/intro)
+  return slug === 'introduction-to-neural-networks';
 }

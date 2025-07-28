@@ -9,6 +9,7 @@ import { Menu, X, BookOpen, BarChart3 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useProgressStore } from '@/app/stores/progressStore';
+import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 const navigation = [
   { name: 'Home', href: '/', icon: BookOpen },
@@ -73,8 +74,24 @@ export function Header() {
             </span>
           </div>
 
-          {/* Theme Toggle & Mobile Menu */}
+          {/* Theme Toggle, Auth & Mobile Menu */}
           <div className="flex items-center space-x-2">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button size="sm">
+                  Sign Up
+                </Button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+            
             <ThemeToggle />
             
             {/* Mobile menu button */}

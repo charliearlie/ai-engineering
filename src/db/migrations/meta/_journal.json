@@ -8,6 +8,13 @@
       "when": 1753564894550,
       "tag": "0000_absent_silver_sable",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753644764710,
+      "tag": "0001_add_lesson_ordering_columns",
+      "breakpoints": true
     }
   ]
 }

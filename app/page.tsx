@@ -1,13 +1,13 @@
 'use client';
 
 import { useLessons } from '@/app/hooks/useLessons';
-import { useUserStore } from '@/app/stores/userStore';
-import { useProgressStore } from '@/app/stores/progressStore';
 import { LessonCard } from '@/app/components/lessons/lesson-card';
 import { EmptyState } from '@/app/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BookOpen, Rocket, Brain } from 'lucide-react';
-import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { BookOpen, Rocket, Brain, UserPlus, Lock } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
+import Link from 'next/link';
 
 function LessonGridSkeleton() {
   return (
@@ -23,14 +23,7 @@ function LessonGridSkeleton() {
 
 export default function Home() {
   const { data: lessonsData, isLoading, error } = useLessons();
-  const initializeUser = useUserStore((state) => state.initializeUser);
-  const fetchProgress = useProgressStore((state) => state.fetchProgress);
-
-  // Initialize user and fetch progress on mount
-  useEffect(() => {
-    initializeUser();
-    fetchProgress();
-  }, [initializeUser, fetchProgress]);
+  const { isSignedIn, isLoaded } = useAuth();
 
   const lessons = lessonsData?.lessons || [];
   const hasLessons = lessons.length > 0;
@@ -88,6 +81,22 @@ export default function Home() {
             hands-on code examples, and challenging quizzes. Start your journey today.
           </p>
         </div>
+
+        {/* Sign-up CTA for unauthenticated users */}
+        {isLoaded && !isSignedIn && (
+          <div className="flex flex-col items-center space-y-4">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 px-4 py-2 rounded-lg">
+              <Lock className="w-4 h-4" />
+              <span className="text-sm font-medium">Sign up free to unlock all lessons</span>
+            </div>
+            <Link href="/sign-up">
+              <Button size="lg" className="gap-2">
+                <UserPlus className="w-4 h-4" />
+                Start Learning for Free
+              </Button>
+            </Link>
+          </div>
+        )}
 
         {/* Quick Stats */}
         {hasLessons && (

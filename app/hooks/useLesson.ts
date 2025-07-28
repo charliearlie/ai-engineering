@@ -35,7 +35,7 @@ export function useLessonContent(slug: string) {
 }
 
 export function useLessonCode(slug: string) {
-  return useQuery<{ code: string; filename: string }>({
+  return useQuery<{ content: string; language: string; lines: number }>({
     queryKey: ['lesson-code', slug],
     queryFn: async () => {
       const response = await fetch(`/api/lessons/${slug}/code`);

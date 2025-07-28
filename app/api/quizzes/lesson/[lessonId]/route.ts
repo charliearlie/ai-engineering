@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/src/db';
-import { quizzes, questions } from '@/src/db/schema';
+import { quizzes, questions, lessons } from '@/src/db/schema';
+import { isLessonLocked } from '@/src/db/queries';
+import { getUserId } from '@/app/lib/user';
 import type { QuizWithQuestions } from '@/app/types/database';
 
 export interface QuizApiResponse {
@@ -50,6 +52,54 @@ export async function GET(
           code: 'INVALID_LESSON_ID',
         },
       }, { status: 400 });
+    }
+
+    // Get lesson info first to check if this is lesson 1
+    const lessonResult = await db
+      .select()
+      .from(lessons)
+      .where(eq(lessons.id, lessonId))
+      .limit(1);
+
+    if (lessonResult.length === 0) {
+      return NextResponse.json({
+        success: false,
+        error: {
+          message: 'Lesson not found',
+          code: 'LESSON_NOT_FOUND',
+        },
+      }, { status: 404 });
+    }
+
+    const lesson = lessonResult[0];
+
+    // Get user ID and check authentication (lesson 1 quiz is free)
+    const userId = await getUserId();
+    
+    // For lesson 1, allow unauthenticated access
+    if (lesson.lessonNumber !== 1 && !userId) {
+      return NextResponse.json({
+        success: false,
+        error: {
+          message: 'Authentication required to access quizzes',
+          code: 'UNAUTHORIZED',
+        },
+      }, { status: 401 });
+    }
+
+    // Check if lesson is locked (only for authenticated users on non-lesson-1)
+    if (userId && lesson.lessonNumber !== 1) {
+      const locked = await isLessonLocked(lesson.lessonNumber, userId);
+      
+      if (locked) {
+        return NextResponse.json({
+          success: false,
+          error: {
+            message: 'Quiz is locked. Complete the previous lesson quiz to unlock.',
+            code: 'QUIZ_LOCKED',
+          },
+        }, { status: 403 });
+      }
     }
 
     // Find the quiz for this lesson

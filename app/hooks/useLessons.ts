@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import type { Lesson } from '@/app/types/database';
+import type { LessonWithLockStatus } from '@/app/types/database';
 
 interface LessonsResponse {
-  lessons: Lesson[];
+  lessons: LessonWithLockStatus[];
   total: number;
 }
 

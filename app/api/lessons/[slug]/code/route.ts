@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getLessonCodePath, readCodeFile, fileExists, formatCodeContent } from '@/app/lib/content';
+import { readCodeFile, fileExists, formatCodeContent } from '@/app/lib/content';
+import { getLessonBySlug, isLessonLocked } from '@/src/db/queries';
+import { getUserId, isLessonFreelyAccessible } from '@/app/lib/user';
+import { join } from 'path';
 
 export interface LessonCodeApiResponse {
   success: boolean;
@@ -41,8 +44,57 @@ export async function GET(
       }, { status: 400 });
     }
 
-    // Get the file path for lesson code
-    const codePath = getLessonCodePath(slug);
+    // Get lesson info from database to get the correct file path
+    const lesson = await getLessonBySlug(slug);
+    
+    if (!lesson) {
+      return NextResponse.json({
+        success: false,
+        error: {
+          message: 'Lesson not found',
+          code: 'LESSON_NOT_FOUND',
+        },
+      }, { status: 404 });
+    }
+
+    // Check if this lesson should be freely accessible (lesson 1 exception)
+    const isFreeLesson = isLessonFreelyAccessible(lesson.slug);
+    
+    if (!isFreeLesson) {
+      // Get user ID and check authentication for non-free lessons
+      const userId = await getUserId();
+      
+      // User must be authenticated to access non-free lesson code
+      if (!userId) {
+        return NextResponse.json({
+          success: false,
+          error: {
+            message: 'Authentication required to access lesson code',
+            code: 'UNAUTHORIZED',
+          },
+        }, { status: 401 });
+      }
+
+      // Check if lesson is locked for this user
+      const locked = await isLessonLocked(lesson.lessonNumber, userId);
+      
+      if (locked) {
+        return NextResponse.json({
+          success: false,
+          error: {
+            message: 'Lesson is locked. Complete the previous lesson quiz to unlock.',
+            code: 'LESSON_LOCKED',
+          },
+        }, { status: 403 });
+      }
+    }
+
+    // Get the code file path based on the lesson's markdown path
+    // Replace 'learning.md' with 'code.py' and ensure it's relative to project root
+    const relativePath = lesson.markdownPath.startsWith('/') 
+      ? lesson.markdownPath.slice(1) // Remove leading slash
+      : lesson.markdownPath;
+    const codePath = join(process.cwd(), relativePath.replace('learning.md', 'code.py'));
     
     // Check if file exists
     if (!fileExists(codePath)) {

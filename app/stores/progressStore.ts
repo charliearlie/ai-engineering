@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface ProgressData {
   lessonId: string;
@@ -26,17 +25,14 @@ interface ProgressState {
   resetAllProgress: () => void;
 }
 
-export const useProgressStore = create<ProgressState>()(
-  persist(
-    (set, get) => ({
-      lessonProgress: new Map(),
-      overallProgress: 0,
+export const useProgressStore = create<ProgressState>()((set, get) => ({
+  lessonProgress: new Map(),
+  overallProgress: 0,
 
-      fetchProgress: async () => {
-        // In the future, this could fetch from the API
-        // For now, we'll just calculate from local storage
-        get().calculateOverallProgress();
-      },
+  fetchProgress: async () => {
+    // This now does nothing - progress comes from server via API
+    // Keeping the function for compatibility
+  },
 
       updateLessonProgress: (lessonId: string, updates: Partial<ProgressData>) => {
         set((state) => {
@@ -123,21 +119,4 @@ export const useProgressStore = create<ProgressState>()(
       resetAllProgress: () => {
         set({ lessonProgress: new Map(), overallProgress: 0 });
       },
-    }),
-    {
-      name: 'ai-engineering-progress',
-      partialize: (state) => ({
-        lessonProgress: Array.from(state.lessonProgress.entries()),
-        overallProgress: state.overallProgress,
-      }),
-      merge: (persistedState: unknown, currentState) => {
-        const state = persistedState as { lessonProgress?: [string, ProgressData][]; overallProgress?: number } | null;
-        return {
-          ...currentState,
-          lessonProgress: new Map(state?.lessonProgress || []),
-          overallProgress: state?.overallProgress || 0,
-        };
-      },
-    }
-  )
-);
+}));

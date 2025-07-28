@@ -42,7 +42,7 @@ export async function GET(
     }
 
     // Get user ID for prerequisite checking
-    const userId = getApiUserId(userIdParam || undefined);
+    const userId = await getApiUserId();
     
     // Validate user ID if provided
     if (userIdParam && !isValidUserId(userIdParam)) {

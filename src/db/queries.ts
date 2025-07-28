@@ -156,6 +156,77 @@ export async function checkPrerequisitesMet(lessonNumber: number, userId: string
   }
 }
 
+/**
+ * Check if a user has passed a specific lesson's quiz
+ */
+export async function hasPassedLessonQuiz(lessonId: string, userId: string): Promise<boolean> {
+  try {
+    // Get the quiz for this lesson
+    const quiz = await db
+      .select()
+      .from(quizzes)
+      .where(eq(quizzes.lessonId, lessonId))
+      .limit(1);
+
+    if (quiz.length === 0) return true; // No quiz means lesson is accessible
+
+    // Check if user has a passing attempt
+    const passingAttempt = await db
+      .select()
+      .from(quizAttempts)
+      .where(and(
+        eq(quizAttempts.userId, userId),
+        eq(quizAttempts.quizId, quiz[0].id),
+        eq(quizAttempts.passed, true)
+      ))
+      .limit(1);
+
+    return passingAttempt.length > 0;
+  } catch (error) {
+    console.error('Error checking quiz pass status:', error);
+    throw new Error('Failed to check quiz status');
+  }
+}
+
+/**
+ * Check if a lesson is locked for a user
+ * A lesson is locked if:
+ * 1. It's not lesson 1 (lesson 1 is always unlocked)
+ * 2. For unauthenticated users: all lessons except lesson 1 are locked
+ * 3. For authenticated users: the previous lesson's quiz hasn't been passed
+ */
+export async function isLessonLocked(lessonNumber: number | null, userId: string | null): Promise<boolean> {
+  try {
+    // Handle null lessonNumber (fallback for invalid data)
+    if (lessonNumber === null || lessonNumber === undefined) {
+      return true; // Lock lessons with invalid numbers
+    }
+
+    // Lesson 1 is always unlocked for everyone
+    if (lessonNumber === 1) return false;
+
+    // For unauthenticated users, all lessons except lesson 1 are locked
+    if (!userId) return true;
+
+    // For authenticated users, check if previous lesson's quiz has been passed
+    const previousLesson = await db
+      .select()
+      .from(lessons)
+      .where(eq(lessons.lessonNumber, lessonNumber - 1))
+      .limit(1);
+
+    if (previousLesson.length === 0) return false; // If no previous lesson found, unlock it
+
+    // Check if the previous lesson's quiz has been passed
+    const hasPassed = await hasPassedLessonQuiz(previousLesson[0].id, userId);
+    
+    return !hasPassed; // Locked if NOT passed
+  } catch (error) {
+    console.error('Error checking lesson lock status:', error);
+    throw new Error('Failed to check lesson lock status');
+  }
+}
+
 export async function createLesson(lesson: NewLesson): Promise<Lesson> {
   try {
     const result = await db.insert(lessons).values(lesson).returning();

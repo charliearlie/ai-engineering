@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { updateUserProgress } from '@/src/db/queries';
-import { getApiUserId, isValidUserId } from '@/app/lib/user';
+import { getUserId } from '@/app/lib/user';
 import type { UserProgress } from '@/app/types/database';
-
-// Validation schema for lesson completion
-const LessonCompleteSchema = z.object({
-  userId: z.string().optional(),
-});
 
 export interface LessonCompleteApiResponse {
   success: boolean;
@@ -43,60 +37,18 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // Parse request body (optional)
-    let body = {};
-    try {
-      const requestBody = await request.text();
-      if (requestBody.trim()) {
-        body = JSON.parse(requestBody);
-      }
-    } catch (error) {
-      return NextResponse.json({
-        success: false,
-        error: {
-          message: 'Invalid JSON in request body',
-          code: 'INVALID_JSON',
-        },
-      }, { status: 400 });
-    }
-
-    // Validate request body
-    const validation = LessonCompleteSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json({
-        success: false,
-        error: {
-          message: 'Invalid request data',
-          code: 'INVALID_REQUEST',
-        },
-      }, { status: 400 });
-    }
-
-    const { userId: requestUserId } = validation.data;
-
-    // Get user ID (from request or generate/get from storage)
-    const userId = getApiUserId(requestUserId);
+    // Get user ID from Clerk auth
+    const userId = await getUserId();
     
-    // Validate user ID
-    if (!isValidUserId(userId)) {
+    // User must be authenticated to complete lessons
+    if (!userId) {
       return NextResponse.json({
         success: false,
         error: {
-          message: 'Invalid user ID format',
-          code: 'INVALID_USER_ID',
+          message: 'Authentication required to complete lessons',
+          code: 'UNAUTHORIZED',
         },
-      }, { status: 400 });
-    }
-
-    // Don't allow completion for server-user
-    if (userId === 'server-user') {
-      return NextResponse.json({
-        success: false,
-        error: {
-          message: 'Cannot complete lesson without valid user ID',
-          code: 'INVALID_USER_CONTEXT',
-        },
-      }, { status: 400 });
+      }, { status: 401 });
     }
 
     // Update user progress to completed

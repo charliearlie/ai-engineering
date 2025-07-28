@@ -1,117 +1,243 @@
 import { db } from './index';
 import { createLesson, createQuiz, createQuestion } from './queries';
 import type { NewLesson, NewQuiz, NewQuestion } from '@/app/types/database';
+import { lessons } from './schema';
+import { sql } from 'drizzle-orm';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// Content parser functions
+interface LessonContent {
+  title: string;
+  description: string;
+  slug: string;
+  lessonNumber: number;
+  phase: 'foundations' | 'modern-architectures' | 'ai-engineering';
+  phaseOrder: number;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedMinutes: number;
+  markdownPath: string;
+  codeExamplesPath: string;
+}
+
+interface QuizContent {
+  title: string;
+  description?: string;
+  passingScore: number;
+  questions: QuizQuestion[];
+}
+
+interface QuizQuestion {
+  questionText: string;
+  questionType: 'multiple_choice' | 'true_false';
+  correctAnswer: string;
+  options: string[];
+  explanation?: string;
+  orderIndex: number;
+}
+
+function parseLessonMarkdown(filePath: string): Partial<LessonContent> {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const lines = content.split('\n');
+  
+  // Extract title from first header
+  const titleMatch = lines.find(line => line.startsWith('# Lesson'));
+  const titleParts = titleMatch?.match(/# Lesson (\d+): (.+)/);
+  const lessonNumber = titleParts ? parseInt(titleParts[1]) : 0;
+  const title = titleParts ? titleParts[2] : '';
+  
+  // Extract description from first paragraph after title
+  let description = '';
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line && !line.startsWith('#') && !line.startsWith('##') && line.length > 20) {
+      description = line;
+      break;
+    }
+  }
+  
+  // Estimate reading time (average 200 words per minute)
+  const wordCount = content.split(/\s+/).length;
+  const estimatedMinutes = Math.max(15, Math.ceil(wordCount / 200));
+  
+  return {
+    title,
+    description,
+    lessonNumber,
+    estimatedMinutes
+  };
+}
+
+function parseQuizJson(filePath: string): QuizContent {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  return JSON.parse(content);
+}
+
+function getLessonPhase(slug: string): { phase: 'foundations' | 'modern-architectures' | 'ai-engineering', phaseOrder: number } {
+  // Based on the 12 lessons we're seeding
+  const lessonOrder = [
+    'introduction-to-neural-networks', 'linear-algebra-for-deep-learning', 'calculus-essentials',
+    'building-a-neuron-from-scratch', 'the-perceptron', 'multi-layer-networks',
+    'backpropagation-demystified', 'optimization-and-learning', 'regularization-techniques',
+    'mnist-digit-recognizer-project', 'introduction-to-pytorch', 'convolutional-neural-networks'
+  ];
+  
+  const index = lessonOrder.findIndex(lesson => slug === lesson);
+  if (index < 10) return { phase: 'foundations', phaseOrder: index + 1 };
+  if (index < 12) return { phase: 'modern-architectures', phaseOrder: index - 9 };
+  return { phase: 'ai-engineering', phaseOrder: 1 };
+}
+
+function getDifficulty(lessonNumber: number): 'beginner' | 'intermediate' | 'advanced' {
+  if (lessonNumber <= 4) return 'beginner';
+  if (lessonNumber <= 8) return 'intermediate';
+  return 'advanced';
+}
 
 async function seedDatabase() {
   console.log('🌱 Starting database seeding...');
 
   try {
+
     // Clear existing data
     await db.execute('TRUNCATE TABLE quiz_attempts, questions, quizzes, user_progress, lessons RESTART IDENTITY CASCADE');
     console.log('🧹 Cleared existing data');
 
-    // Seed Lessons
-    console.log('📚 Creating lessons...');
-    
-    const lesson1: NewLesson = {
-      title: 'Introduction to Neural Networks',
-      description: 'Learn the fundamental concepts of neural networks, including neurons, layers, and basic architecture.',
-      slug: 'introduction-to-neural-networks',
-      orderIndex: 1,
-      difficulty: 'beginner',
-      estimatedMinutes: 45,
-      markdownPath: '/content/lessons/introduction-to-neural-networks/learning.md',
-      codeExamplesPath: '/content/lessons/introduction-to-neural-networks/code.py',
-    };
+    // Define the 12 complete lessons in order
+    const lessonSlugs = [
+      'introduction-to-neural-networks',
+      'linear-algebra-for-deep-learning', 
+      'calculus-essentials',
+      'building-a-neuron-from-scratch',
+      'the-perceptron',
+      'multi-layer-networks',
+      'backpropagation-demystified',
+      'optimization-and-learning',
+      'regularization-techniques',
+      'mnist-digit-recognizer-project',
+      'introduction-to-pytorch',
+      'convolutional-neural-networks'
+    ];
 
-    const createdLessons = await Promise.all([
-      createLesson(lesson1),
-    ]);
+    const contentDir = path.join(process.cwd(), 'content', 'lessons');
+    
+    // Find lesson directories
+    const lessonDirs: string[] = [];
+    const phases = ['phase-1', 'phase-2', 'phase-3'];
+    
+    for (const phase of phases) {
+      const phaseDir = path.join(contentDir, phase);
+      if (fs.existsSync(phaseDir)) {
+        const dirs = fs.readdirSync(phaseDir).filter(dir => {
+          const fullPath = path.join(phaseDir, dir);
+          return fs.statSync(fullPath).isDirectory() && 
+                 lessonSlugs.some(slug => dir === slug);
+        });
+        lessonDirs.push(...dirs.map(dir => path.join(phase, dir)));
+      }
+    }
+
+    console.log(`📚 Found ${lessonDirs.length} lesson directories`);
+
+    // Parse and create lessons
+    const lessonsData: LessonContent[] = [];
+    
+    for (const lessonDir of lessonDirs) {
+      const fullPath = path.join(contentDir, lessonDir);
+      const markdownPath = path.join(fullPath, 'learning.md');
+      const codePath = path.join(fullPath, 'code.py');
+      
+      if (fs.existsSync(markdownPath) && fs.existsSync(codePath)) {
+        const slug = path.basename(lessonDir);
+        const parsedContent = parseLessonMarkdown(markdownPath);
+        const { phase, phaseOrder } = getLessonPhase(slug);
+        
+        const lessonData: LessonContent = {
+          title: parsedContent.title || 'Untitled Lesson',
+          description: parsedContent.description || 'No description available',
+          slug,
+          lessonNumber: parsedContent.lessonNumber || 0,
+          phase,
+          phaseOrder,
+          difficulty: getDifficulty(parsedContent.lessonNumber || 0),
+          estimatedMinutes: parsedContent.estimatedMinutes || 30,
+          markdownPath: `/content/lessons/${lessonDir}/learning.md`,
+          codeExamplesPath: `/content/lessons/${lessonDir}/code.py`
+        };
+        
+        lessonsData.push(lessonData);
+      }
+    }
+
+    // Sort lessons by lesson number
+    lessonsData.sort((a, b) => a.lessonNumber - b.lessonNumber);
+    
+    console.log('📚 Creating lessons...');
+    const createdLessons = [];
+    
+    for (const lessonData of lessonsData) {
+      try {
+        // Use raw SQL to insert with all columns including the new ones
+        const result = await db.execute(sql`
+          INSERT INTO lessons (title, description, slug, order_index, lesson_number, phase, phase_order, prerequisites, difficulty, estimated_minutes, markdown_path, code_examples_path) 
+          VALUES (${lessonData.title}, ${lessonData.description}, ${lessonData.slug}, ${lessonData.lessonNumber}, ${lessonData.lessonNumber}, ${lessonData.phase}::phase, ${lessonData.phaseOrder}, '{}', ${lessonData.difficulty}, ${lessonData.estimatedMinutes}, ${lessonData.markdownPath}, ${lessonData.codeExamplesPath}) 
+          RETURNING *
+        `);
+        
+        console.log(`✅ Created lesson: ${lessonData.title}`);
+        createdLessons.push(result.rows[0]);
+      } catch (error) {
+        console.error(`❌ Failed to create lesson ${lessonData.title}:`, error);
+        throw error;
+      }
+    }
 
     console.log(`✅ Created ${createdLessons.length} lessons`);
 
-    // Seed Quizzes
-    console.log('🧩 Creating quizzes...');
+    // Create quizzes and questions
+    console.log('🧩 Creating quizzes and questions...');
+    const createdQuizzes = [];
+    const createdQuestions = [];
     
-    const quiz1: NewQuiz = {
-      lessonId: createdLessons[0].id,
-      title: 'Linear Algebra Basics Quiz',
-      passingScore: 70,
-    };
-
-    const createdQuizzes = await Promise.all([
-      createQuiz(quiz1),
-    ]);
+    for (let i = 0; i < createdLessons.length; i++) {
+      const lesson = createdLessons[i];
+      const lessonDir = lessonDirs.find(dir => path.basename(dir) === lesson.slug);
+      
+      if (lessonDir) {
+        const quizPath = path.join(contentDir, lessonDir, 'quiz.json');
+        
+        if (fs.existsSync(quizPath)) {
+          const quizData = parseQuizJson(quizPath);
+          
+          const newQuiz: NewQuiz = {
+            lessonId: lesson.id,
+            title: quizData.title,
+            passingScore: quizData.passingScore
+          };
+          
+          const createdQuiz = await createQuiz(newQuiz);
+          createdQuizzes.push(createdQuiz);
+          
+          // Create questions for this quiz
+          for (const questionData of quizData.questions) {
+            const newQuestion: NewQuestion = {
+              quizId: createdQuiz.id,
+              questionText: questionData.questionText,
+              questionType: questionData.questionType,
+              correctAnswer: questionData.correctAnswer,
+              options: questionData.options,
+              explanation: questionData.explanation,
+              orderIndex: questionData.orderIndex
+            };
+            
+            const createdQuestion = await createQuestion(newQuestion);
+            createdQuestions.push(createdQuestion);
+          }
+        }
+      }
+    }
 
     console.log(`✅ Created ${createdQuizzes.length} quizzes`);
-
-    // Seed Questions
-    console.log('❓ Creating questions...');
-
-    // Quiz 1 Questions (Linear Algebra Basics)
-    const quiz1Questions: NewQuestion[] = [
-      {
-        quizId: createdQuizzes[0].id,
-        questionText: 'What is a vector in the context of neural networks?',
-        questionType: 'multiple_choice',
-        correctAnswer: 'A list of numbers representing features or data points',
-        options: [
-          'A list of numbers representing features or data points',
-          'A single numerical value',
-          'A matrix with only one column',
-          'A function that transforms data'
-        ],
-        explanation: 'A vector is a list of numbers that can represent features like pixel values in an image, test scores, or neuron activations.',
-        orderIndex: 1,
-      },
-      {
-        quizId: createdQuizzes[0].id,
-        questionText: 'Calculate the dot product of vectors [2, 3, 1] and [4, -1, 2]:',
-        questionType: 'multiple_choice',
-        correctAnswer: '7',
-        options: ['7', '9', '5', '11'],
-        explanation: 'Dot product = (2×4) + (3×-1) + (1×2) = 8 - 3 + 2 = 7',
-        orderIndex: 2,
-      },
-      {
-        quizId: createdQuizzes[0].id,
-        questionText: 'When the dot product of two vectors is zero, what does this indicate?',
-        questionType: 'multiple_choice',
-        correctAnswer: 'The vectors are perpendicular (orthogonal)',
-        options: [
-          'The vectors are identical',
-          'The vectors are perpendicular (orthogonal)',
-          'One vector is longer than the other',
-          'The vectors are pointing in opposite directions'
-        ],
-        explanation: 'A zero dot product indicates that the vectors are perpendicular to each other (orthogonal).',
-        orderIndex: 3,
-      },
-      {
-        quizId: createdQuizzes[0].id,
-        questionText: 'What is a matrix in the context of neural networks?',
-        questionType: 'multiple_choice',
-        correctAnswer: 'A table of numbers that stores weights between layers',
-        options: [
-          'A table of numbers that stores weights between layers',
-          'A single row of numbers',
-          'A type of activation function',
-          'A neural network layer'
-        ],
-        explanation: 'A matrix is a table of numbers, like a spreadsheet. In neural networks, matrices store all the weights between layers of neurons.',
-        orderIndex: 4,
-      },
-    ];
-
-    // Create all questions
-    const allQuestions = [
-      ...quiz1Questions,
-    ];
-
-    const createdQuestions = await Promise.all(
-      allQuestions.map(question => createQuestion(question))
-    );
-
     console.log(`✅ Created ${createdQuestions.length} questions`);
 
     console.log('🎉 Database seeding completed successfully!');

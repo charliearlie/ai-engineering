@@ -85,6 +85,11 @@ export interface LessonFilter {
   orderBy?: 'lessonNumber' | 'difficulty' | 'title';
 }
 
+export type LessonWithLockStatus = LessonWithQuiz & {
+  isLocked: boolean;
+  userProgress?: UserProgress;
+};
+
 export interface UserLearningStats {
   totalLessons: number;
   completedLessons: number;

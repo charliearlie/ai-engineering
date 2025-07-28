@@ -4,25 +4,45 @@ import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { DifficultyBadge } from '@/app/components/ui/difficulty-badge';
 import { ProgressBar } from '@/app/components/ui/progress-bar';
-import { Clock, CheckCircle, PlayCircle, Circle } from 'lucide-react';
+import { Clock, CheckCircle, PlayCircle, Circle, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Lesson } from '@/app/types/database';
-import { useProgressStore } from '@/app/stores/progressStore';
+import type { LessonWithLockStatus } from '@/app/types/database';
+import { useAuth } from '@clerk/nextjs';
 
 interface LessonCardProps {
-  lesson: Lesson;
+  lesson: LessonWithLockStatus;
   className?: string;
 }
 
 export function LessonCard({ lesson, className }: LessonCardProps) {
-  const lessonProgress = useProgressStore((state) => 
-    state.lessonProgress.get(lesson.id)
-  );
+  const { isSignedIn, isLoaded } = useAuth();
 
-  const status = lessonProgress?.status || 'not_started';
-  const quizScore = lessonProgress?.quizScore;
+  // Determine lesson status based on auth and lock status
+  const getStatus = () => {
+    if (!isLoaded) return 'not_started';
+    
+    // Always respect the server-provided lock status first
+    if (lesson.isLocked) return 'locked';
+    
+    if (!isSignedIn) {
+      // For unauthenticated users: unlocked lessons are available to start
+      return 'not_started';
+    }
+    
+    // For authenticated users: use userProgress from server data if available
+    return lesson.userProgress?.status || 'not_started';
+  };
+
+  const status = getStatus();
+  const quizScore = lesson.userProgress?.quizScore;
 
   const statusConfig = {
+    locked: {
+      icon: Lock,
+      label: 'Locked',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted',
+    },
     not_started: {
       icon: Circle,
       label: 'Not Started',
@@ -46,15 +66,18 @@ export function LessonCard({ lesson, className }: LessonCardProps) {
   const config = statusConfig[status];
   const StatusIcon = config.icon;
 
-  return (
-    <Link href={`/lessons/${lesson.slug}`}>
-      <Card
-        className={cn(
-          'group h-full transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer',
-          'border-border/50 hover:border-border',
-          className
-        )}
-      >
+  const cardContent = (
+    <Card
+      className={cn(
+        'group h-full transition-all duration-200 flex flex-col',
+        lesson.isLocked 
+          ? 'opacity-60 cursor-not-allowed' 
+          : 'hover:shadow-lg hover:-translate-y-1 cursor-pointer',
+        'border-border/50',
+        !lesson.isLocked && 'hover:border-border',
+        className
+      )}
+    >
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-lg leading-6 group-hover:text-primary transition-colors">
@@ -69,24 +92,26 @@ export function LessonCard({ lesson, className }: LessonCardProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="pb-3">
-          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
-            {lesson.description}
-          </p>
+        <CardContent className="pb-3 flex-1 flex flex-col">
+          <div className="flex-1">
+            <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
+              {lesson.description}
+            </p>
 
-          <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              <span>{lesson.estimatedMinutes} min</span>
-            </div>
-            
-            <div className={cn('flex items-center gap-1', config.color)}>
-              <StatusIcon className="w-3 h-3" />
-              <span>{config.label}</span>
+            <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                <span>{lesson.estimatedMinutes} min</span>
+              </div>
+              
+              <div className={cn('flex items-center gap-1', config.color)}>
+                <StatusIcon className="w-3 h-3" />
+                <span>{config.label}</span>
+              </div>
             </div>
           </div>
 
-          {status !== 'not_started' && (
+          {status !== 'not_started' && status !== 'locked' && isSignedIn && (
             <div className="mt-4">
               {status === 'completed' && quizScore !== undefined ? (
                 <div className="space-y-2">
@@ -118,12 +143,29 @@ export function LessonCard({ lesson, className }: LessonCardProps) {
             config.bgColor,
             config.color
           )}>
+            {status === 'locked' && !isSignedIn && 'Sign Up to Unlock'}
+            {status === 'locked' && isSignedIn && 'Complete Previous Lesson'}
             {status === 'not_started' && 'Start Learning'}
             {status === 'in_progress' && 'Continue Learning'}
             {status === 'completed' && 'Review Lesson'}
           </div>
         </CardFooter>
       </Card>
+  );
+
+  // Determine the appropriate link destination
+  const getHref = () => {
+    if (status === 'locked' && !isSignedIn) {
+      return '/sign-up';
+    }
+    return `/lessons/${lesson.slug}`;
+  };
+
+  const shouldDisableLink = status === 'locked' && isSignedIn;
+
+  return shouldDisableLink ? cardContent : (
+    <Link href={getHref()}>
+      {cardContent}
     </Link>
   );
 }

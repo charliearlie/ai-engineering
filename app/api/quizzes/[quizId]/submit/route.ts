@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { submitQuiz } from '@/src/db/queries';
-import { getApiUserId, isValidUserId } from '@/app/lib/user';
+import { getUserId } from '@/app/lib/user';
 import type { QuizResult, QuizSubmission } from '@/app/types/database';
 
 // Validation schema for quiz submission
 const QuizSubmissionSchema = z.object({
-  userId: z.string().optional(),
   answers: z.record(z.string(), z.string()),
 });
 
@@ -70,20 +69,37 @@ export async function POST(
       }, { status: 400 });
     }
 
-    const { userId: requestUserId, answers } = validation.data;
+    const { answers } = validation.data;
 
-    // Get user ID (from request or generate/get from storage)
-    const userId = getApiUserId(requestUserId);
+    // Get user ID from Clerk auth
+    const userId = await getUserId();
     
-    // Validate user ID
-    if (!isValidUserId(userId)) {
+    // Check if this is a lesson 1 quiz (allows unauthenticated access)
+    // First, get the quiz to find its lesson
+    const { db } = await import('@/src/db');
+    const { quizzes, lessons } = await import('@/src/db/schema');
+    const { eq } = await import('drizzle-orm');
+    
+    const quizWithLesson = await db
+      .select({
+        lessonNumber: lessons.lessonNumber,
+      })
+      .from(quizzes)
+      .innerJoin(lessons, eq(quizzes.lessonId, lessons.id))
+      .where(eq(quizzes.id, quizId))
+      .limit(1);
+    
+    const isLesson1Quiz = quizWithLesson.length > 0 && quizWithLesson[0].lessonNumber === 1;
+    
+    // User must be authenticated to submit quizzes (except lesson 1)
+    if (!userId && !isLesson1Quiz) {
       return NextResponse.json({
         success: false,
         error: {
-          message: 'Invalid user ID format',
-          code: 'INVALID_USER_ID',
+          message: 'Authentication required to submit quizzes',
+          code: 'UNAUTHORIZED',
         },
-      }, { status: 400 });
+      }, { status: 401 });
     }
 
     // Validate that answers are provided
@@ -97,15 +113,62 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // Create quiz submission object
-    const submission: QuizSubmission = {
-      quizId,
-      userId,
-      answers,
-    };
+    // Handle quiz submission
+    let result: QuizResult;
+    
+    if (!userId && isLesson1Quiz) {
+      // For unauthenticated lesson 1 quiz: grade but don't save to database
+      const { getQuizWithQuestions } = await import('@/src/db/queries');
+      
+      const quiz = await getQuizWithQuestions(quizId);
+      if (!quiz) {
+        return NextResponse.json({
+          success: false,
+          error: {
+            message: 'Quiz not found',
+            code: 'QUIZ_NOT_FOUND',
+          },
+        }, { status: 404 });
+      }
 
-    // Submit quiz and get results
-    const result = await submitQuiz(submission);
+      let correctCount = 0;
+      const correctAnswers: string[] = [];
+      const explanations: Record<string, string> = {};
+
+      for (const question of quiz.questions) {
+        const userAnswer = answers[question.id];
+        const isCorrect = userAnswer === question.correctAnswer;
+        
+        if (isCorrect) {
+          correctCount++;
+          correctAnswers.push(question.id);
+        }
+        
+        if (question.explanation) {
+          explanations[question.id] = question.explanation;
+        }
+      }
+
+      const score = Math.round((correctCount / quiz.questions.length) * 100);
+      const passed = score >= quiz.passingScore;
+
+      result = {
+        score,
+        passed,
+        correctAnswers,
+        userAnswers: answers,
+        explanations,
+      };
+    } else {
+      // For authenticated users: save to database
+      const submission: QuizSubmission = {
+        quizId,
+        userId: userId!,
+        answers,
+      };
+
+      result = await submitQuiz(submission);
+    }
 
     // No cache for quiz submissions
     const headers = new Headers({

@@ -1,25 +1,28 @@
 'use client';
 
-import { useParams, notFound } from 'next/navigation';
+import { useParams, notFound, useRouter } from 'next/navigation';
 import { useLesson, useLessonContent, useLessonCode } from '@/app/hooks/useLesson';
 import { useQuiz } from '@/app/hooks/useQuiz';
-import { useProgressStore } from '@/app/stores/progressStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownViewer } from '@/app/components/lessons/markdown-viewer';
 import { CodeViewer } from '@/app/components/lessons/code-viewer';
 import { QuizContainer } from '@/app/components/quiz/quiz-container';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { 
   BookOpen, 
   Code, 
   Brain, 
   ArrowLeft, 
   Clock, 
-  CheckCircle 
+  CheckCircle,
+  Lock,
+  UserPlus
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { DifficultyBadge } from '@/app/components/ui/difficulty-badge';
+import { useAuth } from '@clerk/nextjs';
 
 function LessonPageSkeleton() {
   return (
@@ -41,23 +44,59 @@ function LessonPageSkeleton() {
 export default function LessonPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
   
   const { data: lesson, isLoading: lessonLoading, error: lessonError } = useLesson(slug);
   const { data: contentData, isLoading: contentLoading } = useLessonContent(slug);
   const { data: codeData, isLoading: codeLoading } = useLessonCode(slug);
   const { data: quizData, isLoading: quizLoading } = useQuiz(lesson?.id || '');
-  
-  const markLessonInProgress = useProgressStore((state) => state.markLessonInProgress);
-  const lessonProgress = useProgressStore((state) => 
-    lesson?.id ? state.lessonProgress.get(lesson.id) : undefined
-  );
 
-  // Mark lesson as in progress when first accessed
-  useEffect(() => {
-    if (lesson?.id && !lessonProgress) {
-      markLessonInProgress(lesson.id);
+  // Check if user can access this lesson
+  const canAccessLesson = () => {
+    if (!isLoaded) return false;
+    if (!isSignedIn) {
+      // Only lesson 1 (introduction-to-neural-networks) is accessible for unauthenticated users
+      return slug === 'introduction-to-neural-networks';
     }
-  }, [lesson?.id, lessonProgress, markLessonInProgress]);
+    return true; // Authenticated users can access any lesson (server will handle locking)
+  };
+
+  // Show auth required message for non-accessible lessons
+  if (isLoaded && !canAccessLesson() && lesson) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center space-y-6">
+          <div className="flex justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-950">
+              <Lock className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <h1 className="text-2xl font-bold">Authentication Required</h1>
+            <p className="text-muted-foreground">
+              Sign up for free to access this lesson and track your progress through the AI Engineering course.
+            </p>
+          </div>
+
+          <div className="flex gap-4 justify-center">
+            <Link href="/sign-up">
+              <Button size="lg" className="gap-2">
+                <UserPlus className="w-4 h-4" />
+                Sign Up for Free
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" size="lg">
+                Back to Lessons
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (lessonLoading) {
     return <LessonPageSkeleton />;
@@ -68,7 +107,7 @@ export default function LessonPage() {
   }
 
   const hasQuiz = !!quizData && !!quizData.questions && quizData.questions.length > 0;
-  const isCompleted = lessonProgress?.status === 'completed';
+  const isCompleted = lesson.userProgress?.status === 'completed';
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">

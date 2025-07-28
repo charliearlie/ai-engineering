@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllLessons, getUserProgress } from '@/src/db/queries';
-import { getApiUserId, isValidUserId } from '@/app/lib/user';
-import type { LessonWithQuiz, UserProgress } from '@/app/types/database';
+import { getAllLessons, getUserProgress, isLessonLocked } from '@/src/db/queries';
+import { getUserId } from '@/app/lib/user';
+import type { LessonWithQuiz, UserProgress, LessonWithLockStatus } from '@/app/types/database';
 
 export interface LessonsApiResponse {
   success: boolean;
-  data?: Array<LessonWithQuiz & { userProgress?: UserProgress }>;
+  data?: Array<LessonWithLockStatus>;
   error?: {
     message: string;
     code?: string;
@@ -16,24 +16,12 @@ export async function GET(request: NextRequest): Promise<NextResponse<LessonsApi
   try {
     // Get query parameters
     const searchParams = request.nextUrl.searchParams;
-    const userIdParam = searchParams.get('userId');
     const difficulty = searchParams.get('difficulty') as 'beginner' | 'intermediate' | 'advanced' | null;
     const phase = searchParams.get('phase') as 'foundations' | 'modern-architectures' | 'ai-engineering' | null;
     const orderBy = searchParams.get('orderBy') as 'lessonNumber' | 'difficulty' | 'title' | null;
     
-    // Get user ID for progress tracking
-    const userId = getApiUserId(userIdParam || undefined);
-    
-    // Validate user ID if provided
-    if (userIdParam && !isValidUserId(userIdParam)) {
-      return NextResponse.json({
-        success: false,
-        error: {
-          message: 'Invalid user ID format',
-          code: 'INVALID_USER_ID',
-        },
-      }, { status: 400 });
-    }
+    // Get user ID from Clerk auth (optional for lessons list)
+    const userId = await getUserId();
 
     // Build filter object
     const filter: { difficulty?: string; phase?: string; orderBy?: string } = {};
@@ -44,9 +32,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<LessonsApi
     // Fetch lessons with filters
     const lessons = await getAllLessons(Object.keys(filter).length > 0 ? filter : undefined);
     
-    // If userId is provided, fetch user progress
+    // If user is authenticated, fetch their progress
     let userProgressData: UserProgress[] = [];
-    if (userId && userId !== 'server-user') {
+    if (userId) {
       try {
         userProgressData = await getUserProgress(userId);
       } catch (error) {
@@ -55,14 +43,19 @@ export async function GET(request: NextRequest): Promise<NextResponse<LessonsApi
       }
     }
 
-    // Combine lessons with user progress
-    const lessonsWithProgress = lessons.map(lesson => {
-      const progress = userProgressData.find(p => p.lessonId === lesson.id);
-      return {
-        ...lesson,
-        userProgress: progress,
-      };
-    });
+    // Combine lessons with user progress and lock status
+    const lessonsWithProgress = await Promise.all(
+      lessons.map(async lesson => {
+        const progress = userProgressData.find(p => p.lessonId === lesson.id);
+        const isLocked = await isLessonLocked(lesson.lessonNumber, userId);
+        
+        return {
+          ...lesson,
+          userProgress: progress,
+          isLocked,
+        };
+      })
+    );
 
     // Set cache headers for lesson metadata (5 minutes)
     const headers = new Headers({
