@@ -242,7 +242,7 @@ export default function ProgressPage() {
           value={`${Math.round(stats?.averageQuizScore || 0)}%`}
           icon={Brain}
           description="Across all quiz attempts"
-          color={stats?.averageQuizScore >= 70 ? "success" : "warning"}
+          color={(stats?.averageQuizScore ?? 0) >= 70 ? "success" : "warning"}
         />
         
         <StatsCard

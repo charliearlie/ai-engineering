@@ -34,7 +34,6 @@ export function LessonCard({ lesson, className }: LessonCardProps) {
   };
 
   const status = getStatus();
-  const quizScore = lesson.userProgress?.quizScore;
 
   const statusConfig = {
     locked: {
@@ -113,7 +112,7 @@ export function LessonCard({ lesson, className }: LessonCardProps) {
 
           {status !== 'not_started' && status !== 'locked' && isSignedIn && (
             <div className="mt-4">
-              {status === 'completed' && quizScore !== undefined ? (
+              {status === 'completed' ? (
                 <div className="space-y-2">
                   <ProgressBar
                     value={100}
@@ -121,14 +120,11 @@ export function LessonCard({ lesson, className }: LessonCardProps) {
                     size="sm"
                     showLabel={false}
                   />
-                  <div className="text-xs text-muted-foreground">
-                    Quiz Score: {quizScore}%
-                  </div>
                 </div>
               ) : (
                 <ProgressBar
-                  value={status === 'completed' ? 100 : 50}
-                  variant={status === 'completed' ? 'success' : 'primary'}
+                  value={50}
+                  variant="primary"
                   size="sm"
                   showLabel={false}
                 />

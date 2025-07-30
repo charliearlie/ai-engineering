@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllLessons, getUserProgress, isLessonLocked } from '@/src/db/queries';
 import { getUserId } from '@/app/lib/user';
-import type { LessonWithQuiz, UserProgress, LessonWithLockStatus } from '@/app/types/database';
+import type { LessonWithQuiz, UserProgress, LessonWithLockStatus, LessonFilter } from '@/app/types/database';
 
 export interface LessonsApiResponse {
   success: boolean;
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<LessonsApi
     const userId = await getUserId();
 
     // Build filter object
-    const filter: { difficulty?: string; phase?: string; orderBy?: string } = {};
+    const filter: Partial<LessonFilter> = {};
     if (difficulty) filter.difficulty = difficulty;
     if (phase) filter.phase = phase;
     if (orderBy) filter.orderBy = orderBy;

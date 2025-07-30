@@ -185,7 +185,7 @@ async function seedDatabase() {
         `);
         
         console.log(`✅ Created lesson: ${lessonData.title}`);
-        createdLessons.push(result.rows[0]);
+        createdLessons.push(result.rows[0] as { id: string; slug: string });
       } catch (error) {
         console.error(`❌ Failed to create lesson ${lessonData.title}:`, error);
         throw error;

@@ -84,8 +84,8 @@ export function MarkdownViewer({ content, className }: MarkdownViewerProps) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          code: ({ className, children, ...props }: any) => {
-            const inline = props.inline || !className?.startsWith('language-');
+          code: ({ className, children, ...props }) => {
+            const inline = !className?.startsWith('language-');
             if (!children) return null;
             return (
               <CodeBlock

@@ -59,7 +59,7 @@ export function useUserId() {
     userId,
     isLoaded,
     isSignedIn,
-    isValidUserId: isValidUserId(userId),
+    isValidUserId: isValidUserId(userId ?? null),
   };
 }
 

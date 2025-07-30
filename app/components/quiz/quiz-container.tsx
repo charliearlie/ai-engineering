@@ -120,7 +120,6 @@ export function QuizContainer({ quiz, lessonId }: QuizContainerProps) {
           </Badge>
         </div>
         
-        <p className="text-muted-foreground">{quiz.description}</p>
         
         {/* Progress */}
         <div className="space-y-2">

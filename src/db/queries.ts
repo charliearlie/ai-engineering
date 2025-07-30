@@ -27,10 +27,7 @@ import type {
 
 export async function getAllLessons(filter?: LessonFilter): Promise<LessonWithQuiz[]> {
   try {
-    // Build the query with filters
-    let query = db.select().from(lessons);
-    
-    // Apply filters
+    // Build the conditions
     const conditions = [];
     if (filter?.difficulty) {
       conditions.push(eq(lessons.difficulty, filter.difficulty));
@@ -39,22 +36,25 @@ export async function getAllLessons(filter?: LessonFilter): Promise<LessonWithQu
       conditions.push(eq(lessons.phase, filter.phase));
     }
     
+    // Build the complete query
+    let query = db.select().from(lessons);
+    
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      query = query.where(and(...conditions)) as typeof query;
     }
     
     // Apply ordering
     const orderBy = filter?.orderBy || 'lessonNumber';
     switch (orderBy) {
       case 'difficulty':
-        query = query.orderBy(asc(lessons.difficulty), asc(lessons.lessonNumber));
+        query = query.orderBy(asc(lessons.difficulty), asc(lessons.lessonNumber)) as typeof query;
         break;
       case 'title':
-        query = query.orderBy(asc(lessons.title));
+        query = query.orderBy(asc(lessons.title)) as typeof query;
         break;
       case 'lessonNumber':
       default:
-        query = query.orderBy(asc(lessons.lessonNumber));
+        query = query.orderBy(asc(lessons.lessonNumber)) as typeof query;
         break;
     }
     

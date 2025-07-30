@@ -277,15 +277,16 @@ export const currentUser = {
    * Get lessons with current user's progress
    */
   async getLessons(difficulty?: 'beginner' | 'intermediate' | 'advanced') {
-    const userId = getUserId();
-    return lessons.list({ userId, difficulty });
+    const userId = await getUserId();
+    return lessons.list({ userId: userId || undefined, difficulty });
   },
 
   /**
    * Get current user's progress
    */
   async getProgress() {
-    const userId = getUserId();
+    const userId = await getUserId();
+    if (!userId) return null;
     return progress.get(userId);
   },
 
@@ -293,7 +294,8 @@ export const currentUser = {
    * Submit quiz for current user
    */
   async submitQuiz(quizId: string, answers: Record<string, string>) {
-    const userId = getUserId();
+    const userId = await getUserId();
+    if (!userId) throw new Error('User not authenticated');
     return quizzes.submit(quizId, answers, userId);
   },
 
@@ -301,7 +303,8 @@ export const currentUser = {
    * Complete lesson for current user
    */
   async completeLesson(lessonId: string) {
-    const userId = getUserId();
+    const userId = await getUserId();
+    if (!userId) throw new Error('User not authenticated');
     return progress.completeLesson(lessonId, userId);
   },
 };

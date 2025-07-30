@@ -107,7 +107,6 @@ export default function LessonPage() {
   }
 
   const hasQuiz = !!quizData && !!quizData.questions && quizData.questions.length > 0;
-  const isCompleted = lesson.userProgress?.status === 'completed';
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -136,12 +135,6 @@ export default function LessonPage() {
               </p>
             </div>
             
-            {isCompleted && (
-              <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                <CheckCircle className="w-5 h-5" />
-                <span className="text-sm font-medium">Completed</span>
-              </div>
-            )}
           </div>
 
           {/* Lesson Meta */}
